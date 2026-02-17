@@ -1,5 +1,7 @@
 #include "node.h"
 
+#include <cmath>
+
 void node::UpdatePosition(float x, float y) {
     posx = x;
     posy = y;
@@ -8,7 +10,31 @@ void node::UpdatePosition(float x, float y) {
     selected_shape.setPosition({posx - 2.5f, posy - 2.5f});
 }
 
-void node::Display(sf::RenderWindow& window) {
+void node::DisplayLines(sf::RenderWindow& window,std::vector<node>& nodes,std::vector<int>& lista_adiacenta) {
+
+    float myX = posx + 25.f;
+    float myY = posy + 25.f;
+
+    if (lines.size() != lista_adiacenta.size()) {
+        lines.resize(lista_adiacenta.size());
+    }
+
+    for (size_t i = 0; i < lista_adiacenta.size(); i++) {
+        int target_idx = lista_adiacenta[i];
+
+        if (target_idx >= 0 && target_idx < nodes.size()) {
+            float targetX = nodes[target_idx].get_posx() + 25.f;
+            float targetY = nodes[target_idx].get_posy() + 25.f;
+
+            updateLineGeometry(lines[i], myX, myY, targetX, targetY, sf::Color::White);
+
+            window.draw(lines[i]);
+        }
+    }
+
+    if (drafting) {
+        window.draw(draft_line);
+    }
 
     std::string value = "\n  H";
     this->text.setString(value);
@@ -17,11 +43,50 @@ void node::Display(sf::RenderWindow& window) {
         selected_shape.setFillColor(sf::Color(0,200,0));
         window.draw(selected_shape);
     }
-    if (connection) {
+    if (drafting) {
         this->selected_shape.setFillColor(sf::Color(200,200,0));
         window.draw(selected_shape);
     }
 
     window.draw(shape);
     window.draw(text);
+}
+
+void node::DisplayNode(sf::RenderWindow& window) {
+
+    if (drafting) {
+        window.draw(draft_line);
+    }
+
+    std::string value = "\n  H";
+    this->text.setString(value);
+
+    if (selected) {
+        selected_shape.setFillColor(sf::Color(0,200,0));
+        window.draw(selected_shape);
+    }
+    if (drafting) {
+        this->selected_shape.setFillColor(sf::Color(200,200,0));
+        window.draw(selected_shape);
+    }
+
+    window.draw(shape);
+    window.draw(text);
+}
+
+void node::updateLineGeometry(sf::RectangleShape& line, float x1, float y1, float x2, float y2, sf::Color color) {
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+    float length = std::sqrt(dx*dx + dy*dy);
+    float angle = std::atan2(dy, dx) * 180.f / 3.14159f;
+
+    line.setSize({length, 2.0f});
+    line.setOrigin({0, 1.0f});
+    line.setPosition({x1, y1});
+    line.setRotation(sf::degrees(angle));
+    line.setFillColor(color);
+}
+
+void node::update_draft_line(float mouseX, float mouseY) {
+    updateLineGeometry(draft_line, posx + 25.f, posy + 25.f, mouseX, mouseY, sf::Color::Yellow);
 }

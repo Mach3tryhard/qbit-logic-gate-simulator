@@ -9,14 +9,15 @@
 int main() {
 
     sf::RenderWindow window;
-    window.create(sf::VideoMode({1920, 1000}), "qlgs", sf::Style::Default,sf::State::Windowed);
+    window.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed);
     window.setVerticalSyncEnabled(true);
 
-    std::vector<node> qbits;
+    std::vector<node> nodes;
     std::vector<int> lista_adiacenta[1000];
-    node qubit(20,20),qubit2(100,100);
-    qbits.push_back(qubit);
-    qbits.push_back(qubit2);
+    node qubit(20,20),qubit2(100,100),qubit3(200,200);
+    nodes.push_back(qubit);
+    nodes.push_back(qubit2);
+    nodes.push_back(qubit3);
 
     tools instruments;
 
@@ -38,21 +39,20 @@ int main() {
                 if(keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
                     shouldExit = true;
                 }
-
             }
 
             if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
-                    instruments.CheckSelect(window,qbits);
+                    instruments.CheckSelect(window,nodes);
                 }
                 if (mouseButtonPressed->button == sf::Mouse::Button::Right) {
-                    instruments.StartConnection(window, qbits);
+                    instruments.StartConnection(window, nodes);
                 }
             }
 
             if (const auto* mouseRelease = event->getIf<sf::Event::MouseButtonReleased>()) {
                 if (mouseRelease->button == sf::Mouse::Button::Right) {
-                    instruments.EndConnection(window, qbits, lista_adiacenta);
+                    instruments.EndConnection(window, nodes, lista_adiacenta);
                 }
             }
 
@@ -65,20 +65,27 @@ int main() {
         using namespace std::chrono_literals;
         //std::this_thread::sleep_for(100ms);
 
-        instruments.DragSelected(window, qbits);
+        instruments.DragSelected(window, nodes);
+        instruments.UpdateConnectionDrag(window, nodes);
 
         window.clear();
 
         /// MAIN DRAWING PLACE
-        for (int i=0;i<qbits.size();i++) {
-            qbits[i].Display(window);
+        for (int i=0;i<nodes.size();i++) {
+            nodes[i].DisplayLines(window,nodes,lista_adiacenta[i]);
         }
-        if (!lista_adiacenta[0].empty())
-            std::cout<<lista_adiacenta[0][0];
+        for (int i=0;i<nodes.size();i++) {
+            nodes[i].DisplayNode(window);
+        }
 
+        /*for (int i=0;i<3;i++) {
+            for (int j=0;j<lista_adiacenta[i].size();j++) {
+                std::cout<<lista_adiacenta[i][j]<<' ';
+            }
+            std::cout<<" |";
+        }
+        std::cout<<"\n";*/
         window.display();
     }
-
-    std::cout << "Programul a terminat execuția\n";
     return 0;
 }

@@ -65,6 +65,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code/complex.h
         code/tools.cpp
         code/tools.h
+        code_gui/gui.cpp
+        code_gui/gui.h
+        code_gui/button.cpp
+        code_gui/button.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
@@ -98,6 +102,6 @@ endif()
 
 target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code)
 
-copy_files(FILES tastatura.txt DIRECTORY code fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
+copy_files(FILES tastatura.txt DIRECTORY code_gui code fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(FILES tastatura.txt config.json DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
