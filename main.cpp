@@ -2,18 +2,23 @@
 #include <chrono>
 #include <thread>
 #include <SFML/Graphics.hpp>
-
-#include "qbit.h"
+#include <vector>
+#include "node.h"
+#include "tools.h"
 
 int main() {
 
     sf::RenderWindow window;
-
-    window.create(sf::VideoMode({800, 700}), "qlgs", sf::Style::Default);
-
+    window.create(sf::VideoMode({1920, 1000}), "qlgs", sf::Style::Default,sf::State::Windowed);
     window.setVerticalSyncEnabled(true);
 
-    qbit qubit;
+    std::vector<node> qbits;
+    std::vector<int> lista_adiacenta[1000];
+    node qubit(20,20),qubit2(100,100);
+    qbits.push_back(qubit);
+    qbits.push_back(qubit2);
+
+    tools instruments;
 
     while(window.isOpen()) {
         bool shouldExit = false;
@@ -33,7 +38,24 @@ int main() {
                 if(keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
                     shouldExit = true;
                 }
+
             }
+
+            if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left) {
+                    instruments.CheckSelect(window,qbits);
+                }
+                if (mouseButtonPressed->button == sf::Mouse::Button::Right) {
+                    instruments.StartConnection(window, qbits);
+                }
+            }
+
+            if (const auto* mouseRelease = event->getIf<sf::Event::MouseButtonReleased>()) {
+                if (mouseRelease->button == sf::Mouse::Button::Right) {
+                    instruments.EndConnection(window, qbits, lista_adiacenta);
+                }
+            }
+
         }
         if(shouldExit) {
             window.close();
@@ -41,12 +63,18 @@ int main() {
             break;
         }
         using namespace std::chrono_literals;
-        std::this_thread::sleep_for(300ms);
+        //std::this_thread::sleep_for(100ms);
+
+        instruments.DragSelected(window, qbits);
 
         window.clear();
 
         /// MAIN DRAWING PLACE
-        qubit.Display(window);
+        for (int i=0;i<qbits.size();i++) {
+            qbits[i].Display(window);
+        }
+        if (!lista_adiacenta[0].empty())
+            std::cout<<lista_adiacenta[0][0];
 
         window.display();
     }
