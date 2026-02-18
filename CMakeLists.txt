@@ -82,6 +82,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code/complex.h
         code/tools.cpp
         code/tools.h
+        code/gui.cpp
+        code/gui.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <chrono>
 #include <thread>
 
@@ -6,9 +7,9 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#include <vector>
 #include "node.h"
 #include "tools.h"
+#include "gui.h"
 
 int main() {
 
@@ -18,7 +19,7 @@ int main() {
 
     std::vector<node> nodes;
     std::vector<int> lista_adiacenta[1000];
-    node qubit(20,20),qubit2(100,100),qubit3(200,200);
+    node qubit(100,100),qubit2(200,100),qubit3(300,100);
     nodes.push_back(qubit);
     nodes.push_back(qubit2);
     nodes.push_back(qubit3);
@@ -73,42 +74,13 @@ int main() {
         using namespace std::chrono_literals;
         //std::this_thread::sleep_for(100ms);
 
-        // 4. UPDATE IMGUI FRAME ------------------------------------------
-        ImGui::SFML::Update(window, dt);
-        // ----------------------------------------------------------------
+        ///DOING GUI HERE APPARENTLY
+        gui::getInstance().RunGui(window,dt,nodes);
 
-        // --- DEFINE YOUR GUI WINDOW HERE ---
-        ImGui::Begin("Toolbox"); // Create a window called "Toolbox"
-
-        ImGui::Text("Nodes: %zu", nodes.size()); // Display node count
-
-        // SPACER
-        ImGui::Separator();
-
-        // DELETE BUTTON
-        if (ImGui::Button("Delete Selected Node", ImVec2(200, 30))) {
-            // Logic to find and remove selected node
-            for (auto it = nodes.begin(); it != nodes.end(); ) {
-                if (it->get_selected()) {
-                    it = nodes.erase(it);
-                    // Note: You also need to clean up lista_adiacenta for the logic to be perfect!
-                } else {
-                    ++it;
-                }
-            }
+        if (!ImGui::GetIO().WantCaptureMouse) {
+            instruments.DragSelected(window, nodes);
+            instruments.UpdateConnectionDrag(window, nodes);
         }
-        float nodeColor[3] = {0.39f, 0.39f, 0.43f};
-        // COLOR PICKER
-        if (ImGui::ColorEdit3("Node Color", nodeColor)) {
-            // Update selected node color live
-            // (You would need to add a setColor method to your node class)
-        }
-
-        ImGui::End(); // Close the window
-        // -----------------------------------
-
-        instruments.DragSelected(window, nodes);
-        instruments.UpdateConnectionDrag(window, nodes);
 
         window.clear();
 
