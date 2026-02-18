@@ -38,3 +38,18 @@ void tools::DragSelected(sf::RenderWindow& window, std::vector<node>& nodes) {
         }
     }
 }
+
+void tools::StartConnection(sf::RenderWindow& window,std::vector<node>& nodes) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    connection_index = -1;
+
+    for (int i = 0; i < nodes.size(); i++) {
+        float posx = nodes[i].get_posx();
+        float posy = nodes[i].get_posy();
+        if (mousePos.x > posx && mousePos.x < posx + 50.f && mousePos.y > posy && mousePos.y < posy + 50.f) {
+            connection_index = i;
+            nodes[i].set_drafting(true);
+            break;
+        }
+    }
+}

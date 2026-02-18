@@ -7,57 +7,44 @@ class tools {
 private:
     int connection_index = -1;
 public:
-    void CheckSelect(sf::RenderWindow& window,std::vector<node>& qbits);
-    void DragSelected(sf::RenderWindow& window, std::vector<node>& qbits);
+    void CheckSelect(sf::RenderWindow& window,std::vector<node>& nodes);
+    void DragSelected(sf::RenderWindow& window, std::vector<node>& nodes);
 
-    void StartConnection(sf::RenderWindow& window,std::vector<node>& qbits) {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        connection_index = -1;
+    void StartConnection(sf::RenderWindow& window,std::vector<node>& nodes);
 
-        for (int i = 0; i < qbits.size(); i++) {
-            float posx = qbits[i].get_posx();
-            float posy = qbits[i].get_posy();
-            if (mousePos.x > posx && mousePos.x < posx + 50.f && mousePos.y > posy && mousePos.y < posy + 50.f) {
-                connection_index = i;
-                qbits[i].set_drafting(true);
-                break;
-            }
-        }
-    }
-
-    void EndConnection(sf::RenderWindow& window, std::vector<node>& qbits, std::vector<int> (&lista_adiacenta)[1000]) {
+    void EndConnection(sf::RenderWindow& window, std::vector<node>& nodes) {
         if (connection_index == -1) return;
 
-        qbits[connection_index].set_drafting(false);
+        nodes[connection_index].set_drafting(false);
 
         sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-        for (int i = 0; i < qbits.size(); i++) {
-            float posx = qbits[i].get_posx();
-            float posy = qbits[i].get_posy();
+        for (int i = 0; i < nodes.size(); i++) {
+            if (i == connection_index) continue;
 
-            if (mousePos.x > posx && mousePos.x < posx + 50.f && mousePos.y > posy && mousePos.y < posy + 50.f) {
-                if (i != connection_index) {
-                    bool alreadyConnected = false;
-                    for (int existing : lista_adiacenta[connection_index]) {
-                        if (existing == i) {
-                            alreadyConnected = true;
-                            break;
-                        }
-                    }
-                    if (!alreadyConnected) {
-                        lista_adiacenta[connection_index].push_back(i);
-                    }
+            float posx = nodes[i].get_posx();
+            float posy = nodes[i].get_posy();
+
+            if (mousePos.x > posx && mousePos.x < posx + 50.f &&
+                mousePos.y > posy && mousePos.y < posy + 50.f) {
+
+                node* sourceNode = &nodes[connection_index];
+                node* targetNode = &nodes[i];
+
+                if (targetNode->isConnectedTo(sourceNode)) {
+                    std::cout << "Conexiune refuzata: Exista deja sens invers!\n";
+                    break;
                 }
-            }
+                sourceNode->addConnection(targetNode);
+                }
         }
         connection_index = -1;
     }
 
-    void UpdateConnectionDrag(sf::RenderWindow& window, std::vector<node>& qbits) {
+    void UpdateConnectionDrag(sf::RenderWindow& window, std::vector<node>& nodes) {
         if (connection_index != -1) {
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            qbits[connection_index].update_draft_line((float)mousePos.x, (float)mousePos.y);
+            nodes[connection_index].update_draft_line((float)mousePos.x, (float)mousePos.y);
         }
     }
 

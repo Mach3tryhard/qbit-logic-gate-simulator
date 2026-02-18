@@ -2,7 +2,7 @@
 #define OOP_QBIT_H
 #include <iostream>
 #include <winsock2.h>
-
+#include <memory>
 #include <SFML/Graphics.hpp>
 
 class node {
@@ -19,6 +19,8 @@ private:
     float posx,posy;
 
     bool selected=false,drafting=false,connected=false;
+
+    std::vector<node*> lista_adiacenta;
 public:
     node(float x,float y) : text(font), shape({50.0f,50.0f}),
     selected_shape({55.0f,55.0f}), posx(x),posy(y){
@@ -41,9 +43,21 @@ public:
     }
     void UpdatePosition(float x, float y);
     void updateLineGeometry(sf::RectangleShape& line, float x1, float y1, float x2, float y2, sf::Color color);
-    void DisplayLines(sf::RenderWindow& window,std::vector<node>& nodes,std::vector<int> &lista_adiacenta);
+    void DisplayLines(sf::RenderWindow& window);
     void DisplayNode(sf::RenderWindow& window);
     void update_draft_line(float mouseX, float mouseY);
+    void addConnection(node* target) {
+        if (isConnectedTo(target)) return;
+
+        lista_adiacenta.push_back(target);
+        lines.emplace_back();
+    }
+    bool isConnectedTo(node* other) {
+        for (node* n : lista_adiacenta) {
+            if (n == other) return true;
+        }
+        return false;
+    }
     float get_posx() {
         return posx;
     }

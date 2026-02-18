@@ -18,8 +18,8 @@ int main() {
     window.setVerticalSyncEnabled(true);
 
     std::vector<node> nodes;
-    std::vector<int> lista_adiacenta[1000];
-    node qubit(100,100),qubit2(200,100),qubit3(300,100);
+    nodes.reserve(1000);
+    node qubit(100,200),qubit2(200,200),qubit3(300,200);
     nodes.push_back(qubit);
     nodes.push_back(qubit2);
     nodes.push_back(qubit3);
@@ -61,7 +61,7 @@ int main() {
                     if (mousePress->button == sf::Mouse::Button::Right) instruments.StartConnection(window, nodes);
                 }
                 if (const auto* mouseRelease = event->getIf<sf::Event::MouseButtonReleased>()) {
-                    if (mouseRelease->button == sf::Mouse::Button::Right) instruments.EndConnection(window, nodes, lista_adiacenta);
+                    if (mouseRelease->button == sf::Mouse::Button::Right) instruments.EndConnection(window, nodes);
                 }
             }
 
@@ -86,7 +86,7 @@ int main() {
 
         /// MAIN DRAWING PLACE
         for (int i=0;i<nodes.size();i++) {
-            nodes[i].DisplayLines(window,nodes,lista_adiacenta[i]);
+            nodes[i].DisplayLines(window);
         }
         for (int i=0;i<nodes.size();i++) {
             nodes[i].DisplayNode(window);

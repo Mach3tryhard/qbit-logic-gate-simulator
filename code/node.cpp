@@ -10,7 +10,7 @@ void node::UpdatePosition(float x, float y) {
     selected_shape.setPosition({posx - 2.5f, posy - 2.5f});
 }
 
-void node::DisplayLines(sf::RenderWindow& window,std::vector<node>& nodes,std::vector<int>& lista_adiacenta) {
+void node::DisplayLines(sf::RenderWindow& window) {
 
     float myX = posx + 25.f;
     float myY = posy + 25.f;
@@ -19,12 +19,12 @@ void node::DisplayLines(sf::RenderWindow& window,std::vector<node>& nodes,std::v
         lines.resize(lista_adiacenta.size());
     }
 
-    for (size_t i = 0; i < lista_adiacenta.size(); i++) {
-        int target_idx = lista_adiacenta[i];
+    for (int i = 0; i < lista_adiacenta.size(); i++) {
+        node* target = lista_adiacenta[i];
 
-        if (target_idx >= 0 && target_idx < nodes.size()) {
-            float targetX = nodes[target_idx].get_posx() + 25.f;
-            float targetY = nodes[target_idx].get_posy() + 25.f;
+        if (target!=nullptr) {
+            float targetX = target->get_posx() + 25.f;
+            float targetY = target->get_posy() + 25.f;
 
             updateLineGeometry(lines[i], myX, myY, targetX, targetY, sf::Color::White);
 
