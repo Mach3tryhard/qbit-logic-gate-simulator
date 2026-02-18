@@ -44,6 +44,23 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(SFML)
 
+FetchContent_Declare(
+        imgui
+        GIT_REPOSITORY https://github.com/ocornut/imgui
+        GIT_TAG        v1.91.5-docking # Use 'docking' branch for extra features, or 'master'
+)
+FetchContent_MakeAvailable(imgui)
+
+set(IMGUI_DIR ${imgui_SOURCE_DIR})
+set(IMGUI_SFML_FIND_SFML OFF)
+
+FetchContent_Declare(
+        imgui-sfml
+        GIT_REPOSITORY https://github.com/SFML/imgui-sfml
+        GIT_TAG        master # 'master' is required for SFML 3.0 compatibility
+)
+FetchContent_MakeAvailable(imgui-sfml)
+
 ###############################################################################
 
 # external dependencies with find_package
@@ -65,10 +82,6 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code/complex.h
         code/tools.cpp
         code/tools.h
-        code_gui/gui.cpp
-        code_gui/gui.h
-        code_gui/button.cpp
-        code_gui/button.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
@@ -84,7 +97,7 @@ set_compiler_flags(RUN_SANITIZERS TRUE TARGET_NAMES ${MAIN_EXECUTABLE_NAME})
 # target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE ext/<SomeHppLib>/include)
 target_include_directories(${MAIN_EXECUTABLE_NAME} SYSTEM PRIVATE ${SFML_SOURCE_DIR}/include)
 target_link_directories(${MAIN_EXECUTABLE_NAME} PRIVATE ${SFML_BINARY_DIR}/lib)
-target_link_libraries(${MAIN_EXECUTABLE_NAME} PRIVATE SFML::Graphics SFML::Window SFML::System Threads::Threads)
+target_link_libraries(${MAIN_EXECUTABLE_NAME} PRIVATE SFML::Graphics SFML::Window SFML::System Threads::Threads ImGui-SFML::ImGui-SFML)
 
 if(APPLE)
 elseif(UNIX)
@@ -102,6 +115,6 @@ endif()
 
 target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code)
 
-copy_files(FILES tastatura.txt DIRECTORY code_gui code fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
+copy_files(FILES tastatura.txt DIRECTORY code fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(FILES tastatura.txt config.json DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
