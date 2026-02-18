@@ -22,6 +22,7 @@ private:
 
     std::vector<node*> lista_adiacenta;
 public:
+    virtual ~node() = default;
     node(float x,float y) : text(font), shape({50.0f,50.0f}),
     selected_shape({55.0f,55.0f}), posx(x),posy(y){
         if (!this->font.openFromFile("fonts/font.ttf"))
@@ -57,6 +58,38 @@ public:
             if (n == other) return true;
         }
         return false;
+    }
+    void removeConnection(node* targetToRemove) {
+        for (auto it = lista_adiacenta.begin(); it != lista_adiacenta.end(); ) {
+            if (*it == targetToRemove) {
+                long index = std::distance(lista_adiacenta.begin(), it);
+
+                if (index < lines.size()) {
+                    lines.erase(lines.begin() + index);
+                }
+
+                it = lista_adiacenta.erase(it);
+
+            } else {
+                ++it;
+            }
+        }
+    }
+    void DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* targetToDelete) {
+        if (targetToDelete == nullptr) return;
+        for (auto& n : nodes) {
+            n->removeConnection(targetToDelete);
+        }
+
+        for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+            if (it->get() == targetToDelete) {
+
+                nodes.erase(it);
+
+                std::cout << "Nodul a fost sters.\n";
+                return;
+            }
+        }
     }
     float get_posx() {
         return posx;

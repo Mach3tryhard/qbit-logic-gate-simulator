@@ -22,8 +22,9 @@ public:
     int getMode() const {
         return mode;
     }
-
-    void RunGui(sf::RenderWindow & window,sf::Time& dt,std::vector<node>& nodes);
+    void MakeNodeCreator(std::vector<std::unique_ptr<node>>& nodes);
+    void MakeToolbox(std::vector<std::unique_ptr<node>>& nodes);
+    void RunGui(sf::RenderWindow & window,sf::Time& dt,std::vector<std::unique_ptr<node>>& nodes);
 };
 
 

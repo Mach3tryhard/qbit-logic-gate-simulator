@@ -2,6 +2,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <memory>
 
 #include <SFML/Graphics.hpp>
 #include "imgui.h"
@@ -17,12 +18,10 @@ int main() {
     window.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed);
     window.setVerticalSyncEnabled(true);
 
-    std::vector<node> nodes;
-    nodes.reserve(1000);
-    node qubit(100,200),qubit2(200,200),qubit3(300,200);
-    nodes.push_back(qubit);
-    nodes.push_back(qubit2);
-    nodes.push_back(qubit3);
+    std::vector<std::unique_ptr<node>> nodes;
+    nodes.push_back(std::make_unique<node>(100.f, 200.f));
+    nodes.push_back(std::make_unique<node>(200.f, 200.f));
+    nodes.push_back(std::make_unique<node>(300.f, 200.f));
 
     tools instruments;
 
@@ -86,10 +85,10 @@ int main() {
 
         /// MAIN DRAWING PLACE
         for (int i=0;i<nodes.size();i++) {
-            nodes[i].DisplayLines(window);
+            nodes[i]->DisplayLines(window);
         }
         for (int i=0;i<nodes.size();i++) {
-            nodes[i].DisplayNode(window);
+            nodes[i]->DisplayNode(window);
         }
 
         ImGui::SFML::Render(window);
