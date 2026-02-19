@@ -8,105 +8,12 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
+#include "manager.h"
 #include "node.h"
 #include "tools.h"
 #include "gui.h"
 
 int main() {
-
-    sf::RenderWindow window;
-    window.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed);
-    window.setVerticalSyncEnabled(true);
-
-    std::vector<std::unique_ptr<node>> nodes;
-    nodes.push_back(std::make_unique<node>(100.f, 200.f));
-    nodes.push_back(std::make_unique<node>(200.f, 200.f));
-    nodes.push_back(std::make_unique<node>(300.f, 200.f));
-
-    tools instruments;
-
-    if (!ImGui::SFML::Init(window)) return -1;
-    sf::Clock deltaClock;
-
-
-    while(window.isOpen()) {
-        bool shouldExit = false;
-
-        sf::Time dt = deltaClock.restart();
-
-        while(const std::optional event = window.pollEvent()) {
-            ImGui::SFML::ProcessEvent(window, *event);
-
-            if (event->is<sf::Event::Closed>()) {
-                window.close();
-            }
-
-            if (event->is<sf::Event::KeyPressed>()) {
-                const auto* keyPressed = event->getIf<sf::Event::KeyPressed>();
-                if(keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
-                    shouldExit = true;
-                }
-            }
-
-            if (!ImGui::GetIO().WantCaptureMouse) {
-                if (const auto* mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
-                    if (gui::getInstance().getMode()==0 || gui::getInstance().getMode()==1)
-                        if (mousePress->button == sf::Mouse::Button::Left) instruments.CheckSelect(window, nodes);
-                    if (gui::getInstance().getMode()==2)
-                        if (mousePress->button == sf::Mouse::Button::Left) instruments.StartConnection(window, nodes);
-                }
-                if (const auto* mouseRelease = event->getIf<sf::Event::MouseButtonReleased>()) {
-                    if (gui::getInstance().getMode()==2)
-                        if (mouseRelease->button == sf::Mouse::Button::Left)
-                            instruments.EndConnection(window, nodes);
-                    instruments.set_multiple_select(false);
-                }
-            }
-        }
-
-        if(shouldExit) {
-            window.close();
-            break;
-        }
-        using namespace std::chrono_literals;
-        //std::this_thread::sleep_for(100ms);
-
-        ///DOING GUI HERE APPARENTLY
-        gui::getInstance().RunGui(window,dt,nodes);
-
-        window.clear();
-
-        if (!ImGui::GetIO().WantCaptureMouse) {
-            instruments.MultipleSelect(window,nodes);
-            instruments.DragSelected(window, nodes);
-            if (!instruments.get_multiple_select()) {
-                instruments.UpdateConnectionDrag(window, nodes);
-            }
-        }
-        instruments.Deselect(nodes);
-
-        /// MAIN DRAWING PLACE
-        for (int i=0;i<nodes.size();i++) {
-            nodes[i]->DisplayLines(window);
-        }
-        for (int i=0;i<nodes.size();i++) {
-            if (!nodes[i]->get_selected())
-                nodes[i]->DisplayNode(window);
-        }
-        for (int i=0;i<nodes.size();i++) {
-            if (nodes[i]->get_selected())
-                nodes[i]->DisplayNode(window);
-        }
-
-        if (gui::getInstance().getMode() == 3) {
-            instruments.DrawGhostNode(window);
-        }
-
-        ImGui::SFML::Render(window);
-        window.display();
-    }
-
-    ImGui::SFML::Shutdown();
-
+    manager::getInstance().Run();
     return 0;
 }

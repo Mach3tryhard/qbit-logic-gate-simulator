@@ -1,0 +1,51 @@
+#pragma once
+#ifndef OOP_MANAGER_H
+#define OOP_MANAGER_H
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <thread>
+#include <memory>
+
+#include <SFML/Graphics.hpp>
+#include "imgui.h"
+#include "imgui-SFML.h"
+
+#include "node.h"
+#include "tools.h"
+#include "gui.h"
+
+class manager {
+private:
+    sf::RenderWindow windowinst;
+    std::vector<std::unique_ptr<node>> nodes;
+    tools instruments;
+    sf::Clock deltaClock;
+
+    manager() = default;
+public:
+    manager(const manager&) = delete;
+    manager& operator=(const manager&) = delete;
+    static manager& getInstance() {
+        static manager instance;
+        return instance;
+    }
+    void Initialize() {
+        windowinst.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed);
+        windowinst.setVerticalSyncEnabled(true);
+
+        nodes.push_back(std::make_unique<node>(100.f, 200.f));
+        nodes.push_back(std::make_unique<node>(200.f, 200.f));
+        nodes.push_back(std::make_unique<node>(300.f, 200.f));
+
+        ImGui::SFML::Init(windowinst);
+    }
+    void Event_Loop(bool& shouldExit);
+
+
+
+    int Run();
+};
+
+
+#endif //OOP_MANAGER_H

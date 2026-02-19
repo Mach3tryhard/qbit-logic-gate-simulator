@@ -29,7 +29,7 @@ public:
             std::cout<<"EROARE LA LOAD FONT\n";
         }
 
-        this->text.setCharacterSize(16);
+        this->text.setCharacterSize(18);
         this->text.setFillColor(sf::Color::Black);
         this->text.setPosition({posx,posy});
 
