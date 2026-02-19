@@ -6,7 +6,23 @@
 class tools {
 private:
     int connection_index = -1;
+    bool multiple_select = false;
+    int msposx=0,msposy=0;
+
+    sf::Vector2i last_mouse_pos;
+    bool is_dragging_nodes = false;
+
+    sf::RectangleShape select_shape;
 public:
+    tools() {
+        select_shape.setOutlineThickness(2.f);
+        select_shape.setOutlineColor(sf::Color(255, 255, 255));
+        select_shape.setFillColor(sf::Color(100, 100, 100,50));
+        select_shape.setOrigin({0.f, 0.f});
+    }
+
+    void MultipleSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<node>>& nodes);
+
     void CheckSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<node>>& nodes);
     void DragSelected(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
 
@@ -46,6 +62,12 @@ public:
             sf::Vector2i mousePos = sf::Mouse::getPosition(window);
             nodes[connection_index]->update_draft_line((float)mousePos.x, (float)mousePos.y);
         }
+    }
+    bool get_multiple_select() {
+        return multiple_select;
+    }
+    void set_multiple_select(bool val) {
+        multiple_select=val;
     }
 
 };

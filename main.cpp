@@ -61,6 +61,7 @@ int main() {
                 }
                 if (const auto* mouseRelease = event->getIf<sf::Event::MouseButtonReleased>()) {
                     if (mouseRelease->button == sf::Mouse::Button::Right) instruments.EndConnection(window, nodes);
+                    instruments.set_multiple_select(false);
                 }
             }
 
@@ -76,12 +77,15 @@ int main() {
         ///DOING GUI HERE APPARENTLY
         gui::getInstance().RunGui(window,dt,nodes);
 
-        if (!ImGui::GetIO().WantCaptureMouse) {
-            instruments.DragSelected(window, nodes);
-            instruments.UpdateConnectionDrag(window, nodes);
-        }
-
         window.clear();
+
+        if (!ImGui::GetIO().WantCaptureMouse) {
+            instruments.MultipleSelect(window,nodes);
+            instruments.DragSelected(window, nodes);
+            if (!instruments.get_multiple_select()) {
+                instruments.UpdateConnectionDrag(window, nodes);
+            }
+        }
 
         /// MAIN DRAWING PLACE
         for (int i=0;i<nodes.size();i++) {
