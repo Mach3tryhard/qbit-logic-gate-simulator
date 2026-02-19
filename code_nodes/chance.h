@@ -6,7 +6,6 @@
 
 class chance : public node {
 private:
-    complex a,b;
     std::string print_text;
 public:
     chance(float x, float y) : node(x, y) {
@@ -23,7 +22,5 @@ public:
         ImGui::Text("Probability when being measured");
     }
 };
-
-
 
 #endif //OOP_CHANCE_H
