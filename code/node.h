@@ -6,8 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 class node {
-private:
-
+protected:
     sf::Font font;
     sf::Text text;
     sf::RectangleShape shape;
@@ -42,55 +41,21 @@ public:
         this->shape.setFillColor(sf::Color(255, 255, 255));
         this->shape.setPosition({posx,posy});
     }
+
+    virtual void create_node(sf::RenderWindow& window,std::vector<std::unique_ptr<node>>& nodes) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        nodes.push_back(std::make_unique<node>((float)mousePos.x - 25.f, (float)mousePos.y - 25.f));
+    }
+
     void UpdatePosition(float x, float y);
     void updateLineGeometry(sf::RectangleShape& line, float x1, float y1, float x2, float y2, sf::Color color);
     void DisplayLines(sf::RenderWindow& window);
     void DisplayNode(sf::RenderWindow& window);
     void update_draft_line(float mouseX, float mouseY);
-    void addConnection(node* target) {
-        if (isConnectedTo(target)) return;
-
-        lista_adiacenta.push_back(target);
-        lines.emplace_back();
-    }
-    bool isConnectedTo(node* other) {
-        for (node* n : lista_adiacenta) {
-            if (n == other) return true;
-        }
-        return false;
-    }
-    void removeConnection(node* targetToRemove) {
-        for (auto it = lista_adiacenta.begin(); it != lista_adiacenta.end(); ) {
-            if (*it == targetToRemove) {
-                long index = std::distance(lista_adiacenta.begin(), it);
-
-                if (index < lines.size()) {
-                    lines.erase(lines.begin() + index);
-                }
-
-                it = lista_adiacenta.erase(it);
-
-            } else {
-                ++it;
-            }
-        }
-    }
-    void DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* targetToDelete) {
-        if (targetToDelete == nullptr) return;
-        for (auto& n : nodes) {
-            n->removeConnection(targetToDelete);
-        }
-
-        for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-            if (it->get() == targetToDelete) {
-
-                nodes.erase(it);
-
-                std::cout << "Nodul a fost sters.\n";
-                return;
-            }
-        }
-    }
+    void addConnection(node* target);
+    bool isConnectedTo(node* other);
+    void removeConnection(node* targetToRemove);
+    void DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* targetToDelete);
     float get_posx() {
         return posx;
     }
@@ -106,7 +71,9 @@ public:
     void set_selected(const bool val) {
         selected = val;
     }
-
+    const std::vector<node*>& get_connections() const {
+        return lista_adiacenta;
+    }
 };
 
 

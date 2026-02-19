@@ -31,25 +31,6 @@ void node::DisplayLines(sf::RenderWindow& window) {
             window.draw(lines[i]);
         }
     }
-
-    if (drafting) {
-        window.draw(draft_line);
-    }
-
-    std::string value = "\n  H";
-    this->text.setString(value);
-
-    if (selected) {
-        selected_shape.setFillColor(sf::Color(0,200,0));
-        window.draw(selected_shape);
-    }
-    if (drafting) {
-        this->selected_shape.setFillColor(sf::Color(200,200,0));
-        window.draw(selected_shape);
-    }
-
-    window.draw(shape);
-    window.draw(text);
 }
 
 void node::DisplayNode(sf::RenderWindow& window) {
@@ -89,4 +70,52 @@ void node::updateLineGeometry(sf::RectangleShape& line, float x1, float y1, floa
 
 void node::update_draft_line(float mouseX, float mouseY) {
     updateLineGeometry(draft_line, posx + 25.f, posy + 25.f, mouseX, mouseY, sf::Color::Yellow);
+}
+
+void node::DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* targetToDelete) {
+    if (targetToDelete == nullptr) return;
+    for (auto& n : nodes) {
+        n->removeConnection(targetToDelete);
+    }
+
+    for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+        if (it->get() == targetToDelete) {
+
+            nodes.erase(it);
+
+            std::cout << "Nodul a fost sters.\n";
+            return;
+        }
+    }
+}
+
+void node::removeConnection(node* targetToRemove) {
+    for (auto it = lista_adiacenta.begin(); it != lista_adiacenta.end(); ) {
+        if (*it == targetToRemove) {
+            long index = std::distance(lista_adiacenta.begin(), it);
+
+            if (index < lines.size()) {
+                lines.erase(lines.begin() + index);
+            }
+
+            it = lista_adiacenta.erase(it);
+
+        } else {
+            ++it;
+        }
+    }
+}
+
+bool node::isConnectedTo(node* other) {
+    for (node* n : lista_adiacenta) {
+        if (n == other) return true;
+    }
+    return false;
+}
+
+void node::addConnection(node* target) {
+    if (isConnectedTo(target)) return;
+
+    lista_adiacenta.push_back(target);
+    lines.emplace_back();
 }

@@ -35,20 +35,14 @@ int main() {
         sf::Time dt = deltaClock.restart();
 
         while(const std::optional event = window.pollEvent()) {
-
             ImGui::SFML::ProcessEvent(window, *event);
 
             if (event->is<sf::Event::Closed>()) {
                 window.close();
-                std::cout << "Fereastra a fost închisă\n";
             }
-            else if (event->is<sf::Event::Resized>()) {
-                std::cout << "New width: " << window.getSize().x << '\n'
-                          << "New height: " << window.getSize().y << '\n';
-            }
-            else if (event->is<sf::Event::KeyPressed>()) {
+
+            if (event->is<sf::Event::KeyPressed>()) {
                 const auto* keyPressed = event->getIf<sf::Event::KeyPressed>();
-                std::cout << "Received key " << (keyPressed->scancode == sf::Keyboard::Scancode::X ? "X" : "(other)") << "\n";
                 if(keyPressed->scancode == sf::Keyboard::Scancode::Escape) {
                     shouldExit = true;
                 }
@@ -56,19 +50,22 @@ int main() {
 
             if (!ImGui::GetIO().WantCaptureMouse) {
                 if (const auto* mousePress = event->getIf<sf::Event::MouseButtonPressed>()) {
-                    if (mousePress->button == sf::Mouse::Button::Left) instruments.CheckSelect(window, nodes);
-                    if (mousePress->button == sf::Mouse::Button::Right) instruments.StartConnection(window, nodes);
+                    if (gui::getInstance().getMode()==0 || gui::getInstance().getMode()==1)
+                        if (mousePress->button == sf::Mouse::Button::Left) instruments.CheckSelect(window, nodes);
+                    if (gui::getInstance().getMode()==2)
+                        if (mousePress->button == sf::Mouse::Button::Left) instruments.StartConnection(window, nodes);
                 }
                 if (const auto* mouseRelease = event->getIf<sf::Event::MouseButtonReleased>()) {
-                    if (mouseRelease->button == sf::Mouse::Button::Right) instruments.EndConnection(window, nodes);
+                    if (gui::getInstance().getMode()==2)
+                        if (mouseRelease->button == sf::Mouse::Button::Left)
+                            instruments.EndConnection(window, nodes);
                     instruments.set_multiple_select(false);
                 }
             }
-
         }
+
         if(shouldExit) {
             window.close();
-            std::cout << "Fereastra a fost închisă (shouldExit == true)\n";
             break;
         }
         using namespace std::chrono_literals;
@@ -86,13 +83,23 @@ int main() {
                 instruments.UpdateConnectionDrag(window, nodes);
             }
         }
+        instruments.Deselect(nodes);
 
         /// MAIN DRAWING PLACE
         for (int i=0;i<nodes.size();i++) {
             nodes[i]->DisplayLines(window);
         }
         for (int i=0;i<nodes.size();i++) {
-            nodes[i]->DisplayNode(window);
+            if (!nodes[i]->get_selected())
+                nodes[i]->DisplayNode(window);
+        }
+        for (int i=0;i<nodes.size();i++) {
+            if (nodes[i]->get_selected())
+                nodes[i]->DisplayNode(window);
+        }
+
+        if (gui::getInstance().getMode() == 3) {
+            instruments.DrawGhostNode(window);
         }
 
         ImGui::SFML::Render(window);

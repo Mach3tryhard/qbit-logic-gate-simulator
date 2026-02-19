@@ -1,5 +1,18 @@
 #include "tools.h"
 #include "gui.h"
+#include <cmath>
+
+float tools::distancePointToSegment(sf::Vector2f P, sf::Vector2f A, sf::Vector2f B) {
+    float l2 = (B.x - A.x) * (B.x - A.x) + (B.y - A.y) * (B.y - A.y);
+
+    if (l2 == 0.0f) return std::sqrt((P.x - A.x) * (P.x - A.x) + (P.y - A.y) * (P.y - A.y));
+
+    float t = std::max(0.0f, std::min(1.0f, ((P.x - A.x) * (B.x - A.x) + (P.y - A.y) * (B.y - A.y)) / l2));
+
+    sf::Vector2f projection = A + t * (B - A);
+
+    return std::sqrt((P.x - projection.x) * (P.x - projection.x) + (P.y - projection.y) * (P.y - projection.y));
+}
 
 void tools::MultipleSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<node>>& nodes) {
     if (multiple_select==true) {
@@ -20,34 +33,67 @@ void tools::MultipleSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<
     }
 }
 
-void tools::CheckSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<node>>& nodes) {
-    bool found=false;
+void tools::CheckSelect(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
     sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+    sf::Vector2f mousePosFloat(static_cast<float>(localPosition.x), static_cast<float>(localPosition.y));
 
-    for (int i=0;i<nodes.size();i++) {
-        float posx=nodes[i]->get_posx(),posy=nodes[i]->get_posy();
-        if (localPosition.x > posx && localPosition.x <posx+50.f && localPosition.y > posy && localPosition.y <posy + 50.f ) {
-            if (gui::getInstance().getMode()==0) {
-                is_dragging_nodes = true;
-                last_mouse_pos = localPosition;
-                if (!nodes[i]->get_selected()) {
-                    for (auto& n : nodes) n->set_selected(false);
-                    nodes[i]->set_selected(true);
+    if (gui::getInstance().getMode() == 1) {
+
+        for (int i = nodes.size() - 1; i >= 0; i--) {
+            float posx = nodes[i]->get_posx();
+            float posy = nodes[i]->get_posy();
+
+            if (localPosition.x > posx && localPosition.x < posx + 50.f &&
+                localPosition.y > posy && localPosition.y < posy + 50.f) {
+
+                nodes[i]->DeleteSpecificNode(nodes, nodes[i].get());
+                return;
+            }
+        }
+
+        for (auto& sourceNode : nodes) {
+            sf::Vector2f A(sourceNode->get_posx() + 25.f, sourceNode->get_posy() + 25.f);
+
+            for (node* targetNode : sourceNode->get_connections()) {
+                sf::Vector2f B(targetNode->get_posx() + 25.f, targetNode->get_posy() + 25.f);
+
+                float dist = distancePointToSegment(mousePosFloat, A, B);
+
+                if (dist < 8.0f) {
+                    sourceNode->removeConnection(targetNode);
+                    std::cout << "Conexiune stearsa manual!\n";
+                    return;
                 }
-                found=true;
-                return;
             }
-            if (gui::getInstance().getMode()==1) {
-                nodes[i]->DeleteSpecificNode(nodes,nodes[i].get());
-                return;
+        }
+
+        return;
+    }
+    bool found = false;
+
+    for (int i = 0; i < nodes.size(); i++) {
+        float posx = nodes[i]->get_posx();
+        float posy = nodes[i]->get_posy();
+
+        if (localPosition.x > posx && localPosition.x < posx + 50.f &&
+            localPosition.y > posy && localPosition.y < posy + 50.f ) {
+
+            // Setăm variabilele de drag
+            is_dragging_nodes = true;
+            last_mouse_pos = localPosition;
+
+            if (!nodes[i]->get_selected()) {
+                for (auto& n : nodes) n->set_selected(false);
+                nodes[i]->set_selected(true);
             }
+
+            found = true;
+            break;
         }
     }
-    if (!found && gui::getInstance().getMode() == 0) {
-        for (auto& n : nodes) {
-            n->set_selected(false);
-        }
 
+    if (!found) {
+        for (auto& n : nodes) n->set_selected(false);
         multiple_select = true;
         msposx = localPosition.x;
         msposy = localPosition.y;
@@ -89,4 +135,66 @@ void tools::StartConnection(sf::RenderWindow& window,std::vector<std::unique_ptr
             break;
         }
     }
+}
+
+void tools::EndConnection(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
+    if (connection_index == -1) return;
+
+    nodes[connection_index]->set_drafting(false);
+
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+    for (int i = 0; i < nodes.size(); i++) {
+        if (i == connection_index) continue;
+
+        float posx = nodes[i]->get_posx();
+        float posy = nodes[i]->get_posy();
+
+        if (mousePos.x > posx && mousePos.x < posx + 50.f &&
+            mousePos.y > posy && mousePos.y < posy + 50.f) {
+
+            node* sourceNode = nodes[connection_index].get();
+            node* targetNode = nodes[i].get();
+
+            if (targetNode->isConnectedTo(sourceNode)) {
+                std::cout << "Conexiune refuzata: Exista deja sens invers!\n";
+                break;
+            }
+            sourceNode->addConnection(targetNode);
+            }
+    }
+    connection_index = -1;
+}
+
+void tools::UpdateConnectionDrag(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
+    if (connection_index != -1) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        nodes[connection_index]->update_draft_line((float)mousePos.x, (float)mousePos.y);
+    }
+}
+
+void tools::Deselect(std::vector<std::unique_ptr<node>>& nodes) {
+    if (gui::getInstance().getMode()!=0) {
+        for (size_t i=0;i<nodes.size();i++) {
+            nodes[i]->set_selected(false);
+        }
+    }
+}
+
+void tools::DrawGhostNode(sf::RenderWindow& window) {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+    sf::RectangleShape ghostShape(sf::Vector2f(50.f, 50.f));
+
+    float ghostX = (float)mousePos.x - 25.f;
+    float ghostY = (float)mousePos.y - 25.f;
+
+    ghostShape.setPosition({ghostX, ghostY});
+
+    ghostShape.setFillColor(sf::Color(100, 255, 100, 128));
+
+    ghostShape.setOutlineThickness(2.f);
+    ghostShape.setOutlineColor(sf::Color(255, 255, 255, 200));
+
+    window.draw(ghostShape);
 }
