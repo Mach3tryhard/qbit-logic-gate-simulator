@@ -15,6 +15,7 @@
 #include "tools.h"
 #include "gui.h"
 #include "qubit.h"
+#include "logic.h"
 
 class manager {
 private:

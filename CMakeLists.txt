@@ -90,6 +90,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code_nodes/qubit.h
         code/factory.cpp
         code/factory.h
+        code_nodes/chance.cpp
+        code_nodes/chance.h
+        code/logic.cpp
+        code/logic.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

@@ -10,29 +10,45 @@ void gui::MakeNodeCreator(sf::RenderWindow& window, std::vector<std::unique_ptr<
     ImGui::Begin("NodeCreator");
     ImGui::Text("Nodes: %zu", nodes.size());
     ImGui::Separator();
-    ImGui::Button("Qubit", ImVec2(100, 50));
-    if (ImGui::IsItemActive()) {
-        build_type = NodeType::Qubit;
-        if (mode != 3) {
-            previous_mode = mode;
-            mode = 3;
-        }
-    }
 
-    if (ImGui::IsItemDeactivated()) {
-        mode = previous_mode;
-        if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            if (build_type==NodeType::None)
-                std::cout<<"MUIE";
-            auto newNode = factory::CreateNode(build_type, (float)mousePos.x - 25.f, (float)mousePos.y - 25.f);
+    auto SpawnButton = [&](const char* label, NodeType type) {
+        ImGui::Button(label, ImVec2(100, 50));
 
-            if (newNode != nullptr) {
-                nodes.push_back(std::move(newNode));
+        if (ImGui::IsItemActive()) {
+            build_type = type;
+
+            if (mode != 3) {
+                previous_mode = mode;
+                mode = 3;
             }
+
+            ImGui::SetTooltip("Dragging %s", label);
         }
-        build_type=NodeType::None;
-    }
+
+        if (ImGui::IsItemDeactivated()) {
+            mode = previous_mode;
+            if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                auto newNode = factory::CreateNode(type, (float)mousePos.x - 25.f, (float)mousePos.y - 25.f);
+
+                if (newNode != nullptr) {
+                    nodes.push_back(std::move(newNode));
+                    std::cout << "Spawned: " << label << "\n";
+                }
+            }
+
+            build_type = NodeType::None;
+        }
+    };
+
+    ImGui::Text("Qubits:");
+    ImGui::SameLine();
+    ImGui::Text("Output:");
+    SpawnButton("Qubit", NodeType::Qubit);
+    ImGui::SameLine();
+    SpawnButton("Chance", NodeType::Chance);
 
     ImGui::End();
 }

@@ -7,6 +7,7 @@
 enum class NodeType {
     None = 0,
     Qubit,
+    Chance,
     XGate,
     YGate,
     ZGate,

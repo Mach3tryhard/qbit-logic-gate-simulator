@@ -21,6 +21,11 @@ public:
         this->text.setString(print_text);
         window.draw(text);
     }
+    void LogicToDo(complex ca,complex cb) override {
+        for (int i=0;i<lista_adiacenta.size();i++) {
+            lista_adiacenta[i]->LogicToDo(a,b);
+        }
+    }
     void ShowContextMenu() override {
         ImGui::Text("Set State:");
         ImGui::Separator();

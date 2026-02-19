@@ -28,6 +28,8 @@ int manager::Run() {
         }
         instruments.Deselect(nodes);
 
+        logic logic_manager;
+        logic_manager.RunLogic(nodes);
         /// MAIN DRAWING PLACE
         for (int i=0;i<nodes.size();i++) {
             nodes[i]->DisplayLines(windowinst);

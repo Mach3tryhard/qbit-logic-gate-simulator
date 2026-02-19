@@ -3,7 +3,11 @@
 
 class complex {
 public:
-    int real=1,imag=0;
+    float real=1,imag=0;
+
+    float absolute_squared() {
+        return (real * real) + (imag * imag);
+    }
 };
 
 #endif //OOP_COMPLEX_H
