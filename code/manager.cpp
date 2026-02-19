@@ -15,6 +15,8 @@ int manager::Run() {
         ///DOING GUI HERE APPARENTLY
         gui::getInstance().RunGui(windowinst,dt,nodes);
 
+        instruments.HandleNodeContextMenu(windowinst, nodes);
+
         windowinst.clear();
 
         if (!ImGui::GetIO().WantCaptureMouse) {

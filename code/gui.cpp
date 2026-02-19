@@ -3,14 +3,16 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include "node.h"
+#include "qubit.h"
+#include "factory.h"
 
 void gui::MakeNodeCreator(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
     ImGui::Begin("NodeCreator");
     ImGui::Text("Nodes: %zu", nodes.size());
     ImGui::Separator();
-    ImGui::Button("New Node", ImVec2(100, 50));
-
+    ImGui::Button("Qubit", ImVec2(100, 50));
     if (ImGui::IsItemActive()) {
+        build_type = NodeType::Qubit;
         if (mode != 3) {
             previous_mode = mode;
             mode = 3;
@@ -20,8 +22,16 @@ void gui::MakeNodeCreator(sf::RenderWindow& window, std::vector<std::unique_ptr<
     if (ImGui::IsItemDeactivated()) {
         mode = previous_mode;
         if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
-            nodes[0]->create_node(window,nodes);
+            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            if (build_type==NodeType::None)
+                std::cout<<"MUIE";
+            auto newNode = factory::CreateNode(build_type, (float)mousePos.x - 25.f, (float)mousePos.y - 25.f);
+
+            if (newNode != nullptr) {
+                nodes.push_back(std::move(newNode));
+            }
         }
+        build_type=NodeType::None;
     }
 
     ImGui::End();

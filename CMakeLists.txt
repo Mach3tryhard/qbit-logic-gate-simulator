@@ -86,6 +86,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code/gui.h
         code/manager.cpp
         code/manager.h
+        code_nodes/qubit.cpp
+        code_nodes/qubit.h
+        code/factory.cpp
+        code/factory.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
@@ -117,8 +121,8 @@ if(APPLE)
     install(FILES launcher.command DESTINATION ${DESTINATION_DIR})
 endif()
 
-target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code)
+target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code code_nodes)
 
-copy_files(FILES tastatura.txt DIRECTORY code fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
+copy_files(FILES tastatura.txt DIRECTORY code code_nodes fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(FILES tastatura.txt config.json DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})

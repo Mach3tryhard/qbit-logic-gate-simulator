@@ -198,3 +198,32 @@ void tools::DrawGhostNode(sf::RenderWindow& window) {
 
     window.draw(ghostShape);
 }
+
+void tools::HandleNodeContextMenu(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right) && !ImGui::GetIO().WantCaptureMouse) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+        for (auto& n : nodes) {
+            float px = n->get_posx();
+            float py = n->get_posy();
+            if (mousePos.x > px && mousePos.x < px + 50 &&
+                mousePos.y > py && mousePos.y < py + 50) {
+                nodeWithOpenMenu = n.get();
+                ImGui::OpenPopup("NodeContextMenu");
+                break;
+                }
+        }
+    }
+
+    if (ImGui::BeginPopup("NodeContextMenu")) {
+
+        if (nodeWithOpenMenu != nullptr) {
+            nodeWithOpenMenu->ShowContextMenu();
+        }
+
+        ImGui::EndPopup();
+    } else {
+        if (!ImGui::IsPopupOpen("NodeContextMenu")) {
+            nodeWithOpenMenu = nullptr;
+        }
+    }
+}

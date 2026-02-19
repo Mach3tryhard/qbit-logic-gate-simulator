@@ -14,6 +14,7 @@
 #include "node.h"
 #include "tools.h"
 #include "gui.h"
+#include "qubit.h"
 
 class manager {
 private:
@@ -34,9 +35,9 @@ public:
         windowinst.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed);
         windowinst.setVerticalSyncEnabled(true);
 
-        nodes.push_back(std::make_unique<node>(100.f, 200.f));
-        nodes.push_back(std::make_unique<node>(200.f, 200.f));
-        nodes.push_back(std::make_unique<node>(300.f, 200.f));
+        nodes.push_back(std::make_unique<qubit>(100.f, 200.f));
+        nodes.push_back(std::make_unique<qubit>(100.f, 300.f));
+        nodes.push_back(std::make_unique<qubit>(100.f, 400.f));
 
         ImGui::SFML::Init(windowinst);
     }

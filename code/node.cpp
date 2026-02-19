@@ -34,14 +34,6 @@ void node::DisplayLines(sf::RenderWindow& window) {
 }
 
 void node::DisplayNode(sf::RenderWindow& window) {
-
-    if (drafting) {
-        window.draw(draft_line);
-    }
-
-    std::string value = "\n  H";
-    this->text.setString(value);
-
     if (selected) {
         selected_shape.setFillColor(sf::Color(0,200,0));
         window.draw(selected_shape);
@@ -49,10 +41,10 @@ void node::DisplayNode(sf::RenderWindow& window) {
     if (drafting) {
         this->selected_shape.setFillColor(sf::Color(200,200,0));
         window.draw(selected_shape);
+        window.draw(draft_line);
     }
-
     window.draw(shape);
-    window.draw(text);
+    DisplaySpecific(window);
 }
 
 void node::updateLineGeometry(sf::RectangleShape& line, float x1, float y1, float x2, float y2, sf::Color color) {

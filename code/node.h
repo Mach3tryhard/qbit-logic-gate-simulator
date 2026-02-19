@@ -42,10 +42,8 @@ public:
         this->shape.setPosition({posx,posy});
     }
 
-    virtual void create_node(sf::RenderWindow& window,std::vector<std::unique_ptr<node>>& nodes) {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        nodes.push_back(std::make_unique<node>((float)mousePos.x - 25.f, (float)mousePos.y - 25.f));
-    }
+    virtual void ShowContextMenu()=0;
+    virtual void DisplaySpecific(sf::RenderWindow& window)=0;
 
     void UpdatePosition(float x, float y);
     void updateLineGeometry(sf::RectangleShape& line, float x1, float y1, float x2, float y2, sf::Color color);

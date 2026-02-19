@@ -13,6 +13,8 @@ private:
     bool is_dragging_nodes = false;
 
     sf::RectangleShape select_shape;
+
+    node* nodeWithOpenMenu = nullptr;
 public:
     tools() {
         select_shape.setOutlineThickness(2.f);
@@ -30,6 +32,7 @@ public:
     void UpdateConnectionDrag(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
     void Deselect(std::vector<std::unique_ptr<node>>& nodes);
     void DrawGhostNode(sf::RenderWindow& window);
+    void HandleNodeContextMenu(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
 
     bool get_multiple_select() {
         return multiple_select;
