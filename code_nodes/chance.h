@@ -9,7 +9,7 @@ private:
     std::string print_text;
 public:
     chance(float x, float y) : node(x, y) {
-
+        print_text = "NaN";
     }
     void DisplaySpecific(sf::RenderWindow& window) override {
         this->text.setString(print_text);

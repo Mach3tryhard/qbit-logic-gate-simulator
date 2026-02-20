@@ -130,6 +130,6 @@ endif()
 
 target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code code_nodes)
 
-copy_files(FILES tastatura.txt DIRECTORY code code_nodes fonts COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
+copy_files(FILES tastatura.txt DIRECTORY code code_nodes fonts images COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(FILES tastatura.txt config.json DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
