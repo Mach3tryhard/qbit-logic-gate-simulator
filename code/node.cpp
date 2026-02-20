@@ -1,7 +1,5 @@
 #include "node.h"
 
-#include <cmath>
-
 void node::UpdatePosition(float x, float y) {
     posx = x;
     posy = y;
@@ -11,9 +9,9 @@ void node::UpdatePosition(float x, float y) {
 }
 
 void node::DisplayLines(sf::RenderWindow& window) {
-
-    float myX = posx + 25.f;
-    float myY = posy + 25.f;
+    float myX,myY;
+    myX = posx + 25.f;
+    myY = posy + 25.f;
 
     if (lines.size() != lista_adiacenta.size()) {
         lines.resize(lista_adiacenta.size());
@@ -23,8 +21,9 @@ void node::DisplayLines(sf::RenderWindow& window) {
         node* target = lista_adiacenta[i];
 
         if (target!=nullptr) {
-            float targetX = target->get_posx() + 25.f;
-            float targetY = target->get_posy() + 25.f;
+            float targetX,targetY;
+            targetX = target->get_posx() + 25.f;
+            targetY = target->get_posy()+ 25.f;
 
             updateLineGeometry(lines[i], myX, myY, targetX, targetY, sf::Color::White);
 

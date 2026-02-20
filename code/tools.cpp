@@ -78,7 +78,9 @@ void tools::CheckSelect(sf::RenderWindow& window, std::vector<std::unique_ptr<no
         if (localPosition.x > posx && localPosition.x < posx + 50.f &&
             localPosition.y > posy && localPosition.y < posy + 50.f ) {
 
-            // Setăm variabilele de drag
+            drag_accumulator_x = 0.0f;
+            drag_accumulator_y = 0.0f;
+
             is_dragging_nodes = true;
             last_mouse_pos = localPosition;
 
@@ -105,16 +107,52 @@ void tools::DragSelected(sf::RenderWindow& window, std::vector<std::unique_ptr<n
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             sf::Vector2i currentMousePos = sf::Mouse::getPosition(window);
 
-            float dx = static_cast<float>(currentMousePos.x - last_mouse_pos.x);
-            float dy = static_cast<float>(currentMousePos.y - last_mouse_pos.y);
-            if (dx != 0 || dy != 0) {
+            float real_dx = static_cast<float>(currentMousePos.x - last_mouse_pos.x);
+            float real_dy = static_cast<float>(currentMousePos.y - last_mouse_pos.y);
+
+            drag_accumulator_x += real_dx;
+            drag_accumulator_y += real_dy;
+
+            float move_x = 0.0f;
+            float move_y = 0.0f;
+
+            if (settings::getInstance().snapping) {
+                float snap = (float)settings::getInstance().snapping_val;
+
+                float potential_snap_x = round(drag_accumulator_x / snap) * snap;
+                float potential_snap_y = round(drag_accumulator_y / snap) * snap;
+
+                if (potential_snap_x != 0) {
+                    move_x = potential_snap_x;
+                    drag_accumulator_x -= potential_snap_x;
+                }
+                if (potential_snap_y != 0) {
+                    move_y = potential_snap_y;
+                    drag_accumulator_y -= potential_snap_y;
+                }
+            }
+            else {
+                move_x = real_dx;
+                move_y = real_dy;
+            }
+
+            if (move_x != 0 || move_y != 0) {
                 for (auto& n : nodes) {
                     if (n->get_selected()) {
-                        n->UpdatePosition(n->get_posx() + dx, n->get_posy() + dy);
+                        float newX = n->get_posx() + move_x;
+                        float newY = n->get_posy() + move_y;
+
+                        if (settings::getInstance().snapping) {
+                            float snap = (float)settings::getInstance().snapping_val;
+                            newX = round(newX / snap) * snap;
+                            newY = round(newY / snap) * snap;
+                        }
+
+                        n->UpdatePosition(newX, newY);
                     }
                 }
-                last_mouse_pos = currentMousePos;
             }
+            last_mouse_pos = currentMousePos;
         }
         else {
             is_dragging_nodes = false;
@@ -226,4 +264,37 @@ void tools::HandleNodeContextMenu(sf::RenderWindow& window, std::vector<std::uni
             nodeWithOpenMenu = nullptr;
         }
     }
+}
+
+void tools::DrawGrid(sf::RenderWindow& window) {
+    int gridSize = settings::getInstance().snapping_val;
+    if (gridSize <= 0) return;
+
+    sf::View view = window.getView();
+    sf::Vector2f center = view.getCenter();
+    sf::Vector2f size = view.getSize();
+
+    float left = center.x - (size.x / 2.0f);
+    float top = center.y - (size.y / 2.0f);
+    float right = left + size.x;
+    float bottom = top + size.y;
+
+    int startX = (int)(std::floor(left / gridSize) * gridSize);
+    int startY = (int)(std::floor(top / gridSize) * gridSize);
+
+    sf::VertexArray gridLines(sf::PrimitiveType::Lines);
+
+    sf::Color gridColor = sf::Color(60, 60, 60, 100);
+
+    for (float x = (float)startX; x < right; x += (float)gridSize) {
+        gridLines.append(sf::Vertex(sf::Vector2f(x, top), gridColor));
+        gridLines.append(sf::Vertex(sf::Vector2f(x, bottom), gridColor));
+    }
+
+    for (float y = (float)startY; y < bottom; y += (float)gridSize) {
+        gridLines.append(sf::Vertex(sf::Vector2f(left, y), gridColor));
+        gridLines.append(sf::Vertex(sf::Vector2f(right, y), gridColor));
+    }
+
+    window.draw(gridLines);
 }

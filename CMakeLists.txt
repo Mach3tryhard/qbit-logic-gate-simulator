@@ -94,6 +94,9 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code_nodes/chance.h
         code/logic.cpp
         code/logic.h
+        code_nodes/halfturn.cpp
+        code_nodes/halfturn.h
+        code/settings.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

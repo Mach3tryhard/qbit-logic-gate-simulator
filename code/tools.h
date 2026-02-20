@@ -15,6 +15,9 @@ private:
     sf::RectangleShape select_shape;
 
     node* nodeWithOpenMenu = nullptr;
+
+    float drag_accumulator_x = 0.0f;
+    float drag_accumulator_y = 0.0f;
 public:
     tools() {
         select_shape.setOutlineThickness(2.f);
@@ -33,6 +36,7 @@ public:
     void Deselect(std::vector<std::unique_ptr<node>>& nodes);
     void DrawGhostNode(sf::RenderWindow& window);
     void HandleNodeContextMenu(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
+    void DrawGrid(sf::RenderWindow& window);
 
     bool get_multiple_select() {
         return multiple_select;

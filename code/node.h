@@ -1,3 +1,4 @@
+#pragma once
 #ifndef OOP_QBIT_H
 #define OOP_QBIT_H
 #include <iostream>
@@ -5,6 +6,8 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include "complex.h"
+#include <cmath>
+#include "settings.h"
 
 class node {
 protected:
@@ -56,7 +59,6 @@ public:
     bool isConnectedTo(node* other);
     void removeConnection(node* targetToRemove);
     void DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* targetToDelete);
-
     float get_posx() {
         return posx;
     }

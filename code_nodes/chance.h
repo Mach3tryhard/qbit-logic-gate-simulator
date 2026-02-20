@@ -16,10 +16,15 @@ public:
         window.draw(text);
     }
     void LogicToDo(complex ca,complex cb) override {
-        print_text = std::to_string(ca.absolute_squared()*100) + "%";
+        float prob_on = cb.absolute_squared() * 100.0f;
+
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(1) << prob_on;
+
+        print_text = stream.str() + "%";
     }
     void ShowContextMenu() override {
-        ImGui::Text("Probability when being measured");
+        ImGui::Text("TO DO: Switch between multiple modes");
     }
 };
 

@@ -6,6 +6,8 @@
 #include "imgui-SFML.h"
 #include "node.h"
 #include "factory.h"
+#include "logic.h"
+#include "settings.h"
 
 class gui {
 private:
@@ -14,6 +16,8 @@ private:
     int previous_mode = 0;
 
     NodeType build_type = NodeType::None;
+
+    void SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes, const char* label, NodeType type);
 public:
     gui(const gui&) = delete;
     gui& operator=(const gui&) = delete;
@@ -21,10 +25,12 @@ public:
         static gui instance;
         return instance;
     }
-
+    void MakeFPS(sf::RenderWindow & window,sf::Time& dt);
+    void MakeSettings(std::vector<std::unique_ptr<node>>& nodes);
+    void MakeHalfTurns(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
     void MakeNodeCreator(sf::RenderWindow & window,std::vector<std::unique_ptr<node>>& nodes);
     void MakeToolbox(sf::RenderWindow& window);
-    void RunGui(sf::RenderWindow & window,sf::Time& dt,std::vector<std::unique_ptr<node>>& nodes);
+    void RunGui(sf::RenderWindow & window,sf::Time& dt,std::vector<std::unique_ptr<node>>& nodes,std::vector<CompilerMessage>& messages);
 
     int getMode() const {
         return mode;

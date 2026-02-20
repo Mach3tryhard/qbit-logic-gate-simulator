@@ -13,7 +13,7 @@ int manager::Run() {
             break;
         }
         ///DOING GUI HERE APPARENTLY
-        gui::getInstance().RunGui(windowinst,dt,nodes);
+        gui::getInstance().RunGui(windowinst,dt,nodes,logicEngine.get_messages());
 
         instruments.HandleNodeContextMenu(windowinst, nodes);
 
@@ -26,10 +26,16 @@ int manager::Run() {
                 instruments.UpdateConnectionDrag(windowinst, nodes);
             }
         }
+        if (settings::getInstance().snapping) {
+            SnapNodes(nodes);
+        }
+        if (settings::getInstance().show_grid) {
+            instruments.DrawGrid(windowinst);
+        }
         instruments.Deselect(nodes);
 
-        logic logic_manager;
-        logic_manager.RunLogic(nodes);
+        logicEngine.Update(nodes);
+
         /// MAIN DRAWING PLACE
         for (int i=0;i<nodes.size();i++) {
             nodes[i]->DisplayLines(windowinst);
@@ -85,5 +91,19 @@ void manager::Event_Loop(bool& shouldExit) {
                 instruments.set_multiple_select(false);
             }
         }
+    }
+}
+
+void manager::SnapNodes(std::vector<std::unique_ptr<node>>& nodes) {
+    float snap = (float)settings::getInstance().snapping_val;
+
+    for (auto& n : nodes) {
+        float currentX = n->get_posx();
+        float currentY = n->get_posy();
+
+        float newX = round(currentX / snap) * snap;
+        float newY = round(currentY / snap) * snap;
+
+        n->UpdatePosition(newX, newY);
     }
 }

@@ -23,6 +23,7 @@ private:
     std::vector<std::unique_ptr<node>> nodes;
     tools instruments;
     sf::Clock deltaClock;
+    logic logicEngine;
 
     manager() = default;
 public:
@@ -38,13 +39,11 @@ public:
 
         nodes.push_back(std::make_unique<qubit>(100.f, 200.f));
         nodes.push_back(std::make_unique<qubit>(100.f, 300.f));
-        nodes.push_back(std::make_unique<qubit>(100.f, 400.f));
 
         ImGui::SFML::Init(windowinst);
     }
     void Event_Loop(bool& shouldExit);
-
-
+    void SnapNodes(std::vector<std::unique_ptr<node>>& nodes);
 
     int Run();
 };
