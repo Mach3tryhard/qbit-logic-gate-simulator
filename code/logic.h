@@ -70,7 +70,7 @@ private:
         }
     }
 public:
-    void Update(std::vector<std::unique_ptr<node>>& nodes) {
+    void Update(std::vector<std::unique_ptr<node>>& nodes,sf::Time dt) {
         messages.clear();
         system_is_safe = true;
         if (DetectCycles(nodes)) {
@@ -79,16 +79,16 @@ public:
         AnalyzeConnections(nodes);
 
         if (system_is_safe) {
-            RunExecution(nodes);
+            RunExecution(nodes,dt);
         }
     }
-    void RunExecution(std::vector<std::unique_ptr<node>>& nodes) {
+    void RunExecution(std::vector<std::unique_ptr<node>>& nodes,sf::Time dt) {
         int sourceCount = 0;
         for (auto& n : nodes) {
             if (auto* q = dynamic_cast<qubit*>(n.get())) {
                 sourceCount++;
                 complex dummy1, dummy2;
-                q->LogicToDo(dummy1, dummy2);
+                q->LogicToDo(dummy1, dummy2,dt);
             }
         }
 

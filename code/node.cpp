@@ -17,7 +17,7 @@ void node::DisplayLines(sf::RenderWindow& window) {
         lines.resize(lista_adiacenta.size());
     }
 
-    for (int i = 0; i < lista_adiacenta.size(); i++) {
+    for (size_t i = 0; i < lista_adiacenta.size(); i++) {
         node* target = lista_adiacenta[i];
 
         if (target!=nullptr) {

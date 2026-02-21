@@ -21,9 +21,11 @@ class manager {
 private:
     sf::RenderWindow windowinst;
     std::vector<std::unique_ptr<node>> nodes;
+    sf::Time global_time;
     tools instruments;
     sf::Clock deltaClock;
     logic logicEngine;
+    sf::ContextSettings settings;
 
     manager() = default;
 public:
@@ -34,7 +36,8 @@ public:
         return instance;
     }
     void Initialize() {
-        windowinst.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed);
+        settings.antiAliasingLevel = 8;
+        windowinst.create(sf::VideoMode({1920, 1009}), "qlgs", sf::Style::Default,sf::State::Windowed,settings);
         windowinst.setVerticalSyncEnabled(true);
 
         nodes.push_back(std::make_unique<qubit>(100.f, 200.f));

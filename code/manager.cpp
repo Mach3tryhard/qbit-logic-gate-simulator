@@ -4,6 +4,7 @@ int manager::Run() {
     Initialize();
     while(windowinst.isOpen()) {
         bool shouldExit = false;
+        global_time+=deltaClock.getElapsedTime();
         sf::Time dt = deltaClock.restart();
 
         Event_Loop(shouldExit);
@@ -34,17 +35,17 @@ int manager::Run() {
         }
         instruments.Deselect(nodes);
 
-        logicEngine.Update(nodes);
+        logicEngine.Update(nodes,global_time);
 
         /// MAIN DRAWING PLACE
-        for (int i=0;i<nodes.size();i++) {
+        for (size_t i=0;i<nodes.size();i++) {
             nodes[i]->DisplayLines(windowinst);
         }
-        for (int i=0;i<nodes.size();i++) {
+        for (size_t i=0;i<nodes.size();i++) {
             if (!nodes[i]->get_selected())
                 nodes[i]->DisplayNode(windowinst);
         }
-        for (int i=0;i<nodes.size();i++) {
+        for (size_t i=0;i<nodes.size();i++) {
             if (nodes[i]->get_selected())
                 nodes[i]->DisplayNode(windowinst);
         }

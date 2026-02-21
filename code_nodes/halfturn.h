@@ -23,20 +23,33 @@ private:
     complex mat[2][2];
     std::string print_text;
     halfturn_type gatetype;
+
+    sf::Texture iconTexture;
+    sf::Sprite iconSprite;
 public:
-    halfturn(float x, float y,halfturn_type gatetype_par) : node(x, y) {
+    halfturn(float x, float y,halfturn_type gatetype_par) : node(x, y), iconSprite(iconTexture) {
         gatetype = gatetype_par;
         SetGate();
+
+        iconSprite.setTexture(iconTexture, true);
+
+        sf::Vector2u size = iconTexture.getSize();
+        iconSprite.setOrigin({size.x / 2.0f, size.y / 2.0f});
+
+        float targetSize = 50.0f;
+        float scale = targetSize / (float) size.x;
+        iconSprite.setScale({scale, scale});
     }
+
     void DisplaySpecific(sf::RenderWindow& window) override {
-        this->text.setString(print_text);
-        window.draw(text);
+        iconSprite.setPosition({posx + 25.0f, posy + 25.0f});
+        window.draw(iconSprite);
     }
-    void LogicToDo(complex ca,complex cb) override {
-        for (int i=0;i<lista_adiacenta.size();i++) {
+    void LogicToDo(complex ca,complex cb,sf::Time dt) override {
+        for (size_t i=0;i<lista_adiacenta.size();i++) {
             std::pair<complex,complex> state;
             state = complex::MatrixMultiply(ca,cb,mat);
-            lista_adiacenta[i]->LogicToDo(state.first,state.second);
+            lista_adiacenta[i]->LogicToDo(state.first,state.second,dt);
         }
     }
     void ShowContextMenu() override {
@@ -60,33 +73,50 @@ public:
         }
     }
     void SetGate() {
+        std::string filename;
         if (gatetype==halfturn_type::PauliX) {
             mat[0][0]=C_0;
             mat[0][1]=C_1;
             mat[1][0]=C_1;
             mat[1][1]=C_0;
-            print_text = "X";
+            filename="images/gates/gate_x.png";
+            iconTexture.setSmooth(true);
+            if (iconTexture.generateMipmap()){}
         }
         if (gatetype==halfturn_type::PauliY) {
             mat[0][0]=C_0;
             mat[0][1]=C_Ni;
             mat[1][0]=C_i;
             mat[1][1]=C_0;
-            print_text = "Y";
+            filename="images/gates/gate_y.png";
+            iconTexture.setSmooth(true);
+            if (iconTexture.generateMipmap()){}
         }
         if (gatetype==halfturn_type::PauliZ) {
             mat[0][0]=C_1;
             mat[0][1]=C_0;
             mat[1][0]=C_0;
             mat[1][1]=C_N1;
-            print_text = "Z";
+            filename="images/gates/gate_z.png";
+            iconTexture.setSmooth(true);
+            if (iconTexture.generateMipmap()){}
         }
         if (gatetype==halfturn_type::Hadamard) {
             mat[0][0]={SQ2,0};
             mat[0][1]={SQ2,0};
             mat[1][0]={SQ2,0};
             mat[1][1]={-SQ2,0};
-            print_text = "H";
+            filename="images/gates/gate_h.png";
+            iconTexture.setSmooth(true);
+            if (iconTexture.generateMipmap()){}
+            iconSprite.setTexture(iconTexture, true);
+        }
+        if (!iconTexture.loadFromFile(filename)) {
+            std::cout<<"Eroare la imagine pentru half turn gate!\n";
+        } else {
+            iconTexture.setSmooth(true);
+            if (iconTexture.generateMipmap()){}
+            iconSprite.setTexture(iconTexture, true);
         }
     }
 };

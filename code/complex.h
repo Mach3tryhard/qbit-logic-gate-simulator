@@ -4,7 +4,7 @@
 
 class complex {
 public:
-    float real=0.f,imag=0.f;
+    long double real=0.f,imag=0.f;
 
     float absolute_squared() {
         return (real * real) + (imag * imag);

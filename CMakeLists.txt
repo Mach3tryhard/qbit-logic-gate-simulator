@@ -97,6 +97,14 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code_nodes/halfturn.cpp
         code_nodes/halfturn.h
         code/settings.h
+        code_nodes/quarterturn.cpp
+        code_nodes/quarterturn.h
+        code_nodes/spinning.cpp
+        code_nodes/spinning.h
+        code_nodes/formulaic.cpp
+        code_nodes/formulaic.h
+        code_nodes/bloch.cpp
+        code_nodes/bloch.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

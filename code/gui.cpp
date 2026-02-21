@@ -6,9 +6,13 @@
 #include "qubit.h"
 #include "factory.h"
 
-void gui::SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes, const char* label, NodeType type) {
-    ImGui::Button(label, ImVec2(100, 50));
+void gui::SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes, const char* label, const std::string& imagePath, NodeType type) {
 
+    sf::Texture& texture = GetTexture(imagePath);
+    texture.setSmooth(true);
+    texture.generateMipmap();
+
+    if (ImGui::ImageButton(label,texture, sf::Vector2f({50.f, 50.f}))) {}
     if (ImGui::IsItemActive()) {
         build_type = type;
 
@@ -17,7 +21,7 @@ void gui::SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node
             mode = 3;
         }
 
-        ImGui::SetTooltip("Dragging %s", label);
+        ImGui::SetTooltip("%s", label);
     }
 
     if (ImGui::IsItemDeactivated()) {
@@ -45,28 +49,78 @@ void gui::SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node
 }
 
 void gui::MakeNodeCreator(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
-    ImGui::Begin("NodeCreator");
-    ImGui::Text("Nodes: %zu", nodes.size());
+    ImGui::Begin("Input and Output");
     ImGui::Separator();
 
-    ImGui::Text("Qubits:");
+    SpawnButton(window,nodes,"Qubit","images/qubit/state_0.png", NodeType::Qubit);
     ImGui::SameLine();
-    ImGui::Text("Output:");
-    SpawnButton(window,nodes,"Qubit", NodeType::Qubit);
+    SpawnButton(window,nodes,"Chance","images/output/chance.png", NodeType::Chance);
     ImGui::SameLine();
-    SpawnButton(window,nodes,"Chance", NodeType::Chance);
+    SpawnButton(window,nodes,"Bloch","images/output/bloch.png", NodeType::Bloch);
+
     ImGui::End();
 }
 
 void gui::MakeHalfTurns(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
     ImGui::Begin("Half Turn Gates");
     ImGui::Separator();
-    SpawnButton(window,nodes,"Pauli X", NodeType::PauliX);
+    SpawnButton(window,nodes,"Pauli X","images/gates/gate_x.png", NodeType::PauliX);
     ImGui::SameLine();
-    SpawnButton(window,nodes,"Pauli Y", NodeType::PauliY);
-    SpawnButton(window,nodes,"Pauli Z", NodeType::PauliZ);
+    SpawnButton(window,nodes,"Pauli Y","images/gates/gate_y.png", NodeType::PauliY);
+    SpawnButton(window,nodes,"Pauli Z","images/gates/gate_z.png", NodeType::PauliZ);
     ImGui::SameLine();
-    SpawnButton(window,nodes,"Hadamard", NodeType::Hadamard);
+    SpawnButton(window,nodes,"Hadamard","images/gates/gate_h.png", NodeType::Hadamard);
+    ImGui::End();
+}
+
+void gui::MakeQuarterTurns(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
+    ImGui::Begin("Quarter Turn Gates");
+    ImGui::Separator();
+    SpawnButton(window,nodes,"S Gate","images/gates/gate_s.png", NodeType::S_Gate);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Y Square Root Gate","images/gates/gate_y_half.png", NodeType::Y_Sqrt);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"X Square Root Gate","images/gates/gate_x_half.png", NodeType::X_Sqrt);
+
+    SpawnButton(window,nodes,"S Dagger Gate","images/gates/gate_sdg.png", NodeType::S_Dagger);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Y Square Root Dagger Gate","images/gates/gate_y_nhalf.png", NodeType::Y_Sqrt_Dagger);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"X Square Root Dagger Gate","images/gates/gate_x_nhalf.png", NodeType::X_Sqrt_Dagger);
+    ImGui::End();
+}
+
+void gui::MakeSpinning(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
+    ImGui::Begin("Spinning Gates");
+    ImGui::Separator();
+    SpawnButton(window,nodes,"Z function t","images/gates/gate_z_t.png", NodeType::Z_t);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Y function t","images/gates/gate_y_t.png", NodeType::Y_t);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"X function t","images/gates/gate_x_t.png", NodeType::X_t);
+
+    SpawnButton(window,nodes,"Z Dagger function t","images/gates/gate_z_nt.png", NodeType::Z_nt);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Y Dagger function t","images/gates/gate_y_nt.png", NodeType::Y_nt);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"X Dagger function t","images/gates/gate_x_nt.png", NodeType::X_nt);
+    ImGui::End();
+}
+
+void gui::MakeFormulaic(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes) {
+    ImGui::Begin("Formulaic Gates");
+    ImGui::Separator();
+    SpawnButton(window,nodes,"Z power function","images/gates/gate_z_ft.png", NodeType::Z_pow);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Y power function","images/gates/gate_y_ft.png", NodeType::Y_pow);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"X power function","images/gates/gate_x_ft.png", NodeType::X_pow);
+
+    SpawnButton(window,nodes,"Formulaic RZ","images/gates/gate_rz_ft.png", NodeType::RZ);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Formulaic RY","images/gates/gate_ry_ft.png", NodeType::RY);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Formulaic RX","images/gates/gate_rx_ft.png", NodeType::RX);
     ImGui::End();
 }
 
@@ -156,9 +210,23 @@ void gui::RunGui(sf::RenderWindow & window,sf::Time& dt,std::vector<std::unique_
     MakeNodeCreator(window,nodes);
     MakeToolbox(window);
     MakeHalfTurns(window,nodes);
+    MakeQuarterTurns(window,nodes);
+    MakeSpinning(window,nodes);
+    MakeFormulaic(window,nodes);
     DrawDebugWindow(messages);
     MakeFPS(window,dt);
 
     //ImGui::ShowDemoWindow();
 }
 
+sf::Texture& gui::GetTexture(const std::string& filename) {
+    if (button_textures.find(filename) == button_textures.end()) {
+        sf::Texture tex;
+        if (tex.loadFromFile(filename)) {
+            tex.setSmooth(true);
+            if (tex.generateMipmap()){}
+        }
+        button_textures[filename] = tex;
+    }
+    return button_textures[filename];
+}

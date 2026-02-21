@@ -17,7 +17,9 @@ private:
 
     NodeType build_type = NodeType::None;
 
-    void SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes, const char* label, NodeType type);
+    std::map<std::string, sf::Texture> button_textures;
+
+    void SpawnButton(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes, const char* label, const std::string& imagePath, NodeType type);
 public:
     gui(const gui&) = delete;
     gui& operator=(const gui&) = delete;
@@ -28,9 +30,14 @@ public:
     void MakeFPS(sf::RenderWindow & window,sf::Time& dt);
     void MakeSettings(std::vector<std::unique_ptr<node>>& nodes);
     void MakeHalfTurns(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
+    void MakeQuarterTurns(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
     void MakeNodeCreator(sf::RenderWindow & window,std::vector<std::unique_ptr<node>>& nodes);
+    void MakeSpinning(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
+    void MakeFormulaic(sf::RenderWindow& window, std::vector<std::unique_ptr<node>>& nodes);
     void MakeToolbox(sf::RenderWindow& window);
     void RunGui(sf::RenderWindow & window,sf::Time& dt,std::vector<std::unique_ptr<node>>& nodes,std::vector<CompilerMessage>& messages);
+
+    sf::Texture& GetTexture(const std::string& filename);
 
     int getMode() const {
         return mode;

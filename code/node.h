@@ -48,7 +48,7 @@ public:
 
     virtual void ShowContextMenu()=0;
     virtual void DisplaySpecific(sf::RenderWindow& window)=0;
-    virtual void LogicToDo(complex a,complex b)=0;
+    virtual void LogicToDo(complex a,complex b,sf::Time dt)=0;
 
     void UpdatePosition(float x, float y);
     void updateLineGeometry(sf::RectangleShape& line, float x1, float y1, float x2, float y2, sf::Color color);

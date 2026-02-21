@@ -25,7 +25,7 @@ void tools::MultipleSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<
         select_shape.setPosition({minposx, minposy});
         window.draw(select_shape);
 
-        for (int i=0;i<nodes.size();i++) {
+        for (size_t i=0;i<nodes.size();i++) {
             if (nodes[i]->get_posx()+50.f>minposx && nodes[i]->get_posx()<maxposx && nodes[i]->get_posy()+50.f>minposy && nodes[i]->get_posy()<maxposy) {
                 nodes[i]->set_selected(true);
             }
@@ -71,7 +71,7 @@ void tools::CheckSelect(sf::RenderWindow& window, std::vector<std::unique_ptr<no
     }
     bool found = false;
 
-    for (int i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); i++) {
         float posx = nodes[i]->get_posx();
         float posy = nodes[i]->get_posy();
 
@@ -164,7 +164,7 @@ void tools::StartConnection(sf::RenderWindow& window,std::vector<std::unique_ptr
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
     connection_index = -1;
 
-    for (int i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); i++) {
         float posx = nodes[i]->get_posx();
         float posy = nodes[i]->get_posy();
         if (mousePos.x > posx && mousePos.x < posx + 50.f && mousePos.y > posy && mousePos.y < posy + 50.f) {
@@ -182,7 +182,7 @@ void tools::EndConnection(sf::RenderWindow& window, std::vector<std::unique_ptr<
 
     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-    for (int i = 0; i < nodes.size(); i++) {
+    for (size_t i = 0; i < nodes.size(); i++) {
         if (i == connection_index) continue;
 
         float posx = nodes[i]->get_posx();
@@ -194,10 +194,10 @@ void tools::EndConnection(sf::RenderWindow& window, std::vector<std::unique_ptr<
             node* sourceNode = nodes[connection_index].get();
             node* targetNode = nodes[i].get();
 
-            if (targetNode->isConnectedTo(sourceNode)) {
+            /*if (targetNode->isConnectedTo(sourceNode)) {
                 std::cout << "Conexiune refuzata: Exista deja sens invers!\n";
                 break;
-            }
+            }*/
             sourceNode->addConnection(targetNode);
             }
     }
