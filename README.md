@@ -1,3 +1,3 @@
 # QUANTUM LOGIC GATE SIMULATOR
-<img width="1918" height="1008" alt="image" src="https://github.com/user-attachments/assets/e6ad2971-e50b-4ebb-b855-d58f05f039b1" />
 
+<img width="1914" height="1007" alt="image" src="https://github.com/user-attachments/assets/ff358548-8bcb-4ed1-884a-9e6431b8b5e8" />
