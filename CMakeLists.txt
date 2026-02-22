@@ -109,6 +109,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code_visual/complex_cell.h
         code_nodes/amplitude.cpp
         code_nodes/amplitude.h
+        code_nodes/density.cpp
+        code_nodes/density.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )

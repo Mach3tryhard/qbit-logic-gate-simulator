@@ -59,6 +59,8 @@ void gui::MakeNodeCreator(sf::RenderWindow& window, std::vector<std::unique_ptr<
     SpawnButton(window,nodes,"Bloch","images/output/bloch.png", NodeType::Bloch);
 
     SpawnButton(window,nodes,"Amplitutde","images/output/amps.png",NodeType::Amplitutde);
+    ImGui::SameLine();
+    SpawnButton(window,nodes,"Density","images/output/density.png",NodeType::Density);
 
     ImGui::End();
 }

@@ -8,72 +8,105 @@
 class complex_cell {
 private:
     sf::RectangleShape background;
-    sf::RectangleShape fill;
-    sf::CircleShape circle;
-    sf::RectangleShape radius_line;
-    sf::Vector2f position;
+    sf::RectangleShape probability_fill;
+    sf::CircleShape reference_ring;
+    sf::CircleShape filled_circle;
+    sf::RectangleShape needle;
+
     float size;
+    float center_x, center_y;
 
 public:
-    void setup(float s) {
-        size = s;
+    complex_cell() {
+        reference_ring.setFillColor(sf::Color::Transparent);
+        reference_ring.setOutlineColor(sf::Color(200, 200, 200, 100));
+        reference_ring.setOutlineThickness(1.0f);
 
-        background.setSize({size, size});
-        background.setFillColor(sf::Color(245, 245, 245));
-        background.setOutlineColor(sf::Color(200, 200, 200));
+        filled_circle.setFillColor(sf::Color(100, 200, 220, 200));
+        needle.setFillColor(sf::Color::Black);
+
+        background.setFillColor(sf::Color::White);
+        background.setOutlineColor(sf::Color(220, 220, 220));
         background.setOutlineThickness(1.0f);
 
-        fill.setFillColor(sf::Color(100, 200, 200, 200));
+        probability_fill.setFillColor(sf::Color(100, 200, 100, 100));
+        probability_fill.setSize({0.f, 0.f});
+    }
 
-        float circleRadius = size * 0.4f;
-        circle.setRadius(circleRadius);
-        circle.setOrigin({circleRadius, circleRadius});
-        circle.setFillColor(sf::Color::Transparent);
-        circle.setOutlineColor(sf::Color(150, 150, 150));
-        circle.setOutlineThickness(1.5f);
-        circle.setPointCount(30);
+    void setup(float cell_size) {
+        size = cell_size;
+        float half_size = size / 2.0f;
 
-        radius_line.setFillColor(sf::Color::Black);
+        background.setSize({size, size});
+        background.setOrigin({half_size, half_size});
+
+        probability_fill.setSize({size, 0.f});
+        probability_fill.setOrigin({half_size, 0.f});
+
+        float max_radius = half_size - 2.0f;
+        reference_ring.setRadius(max_radius);
+        reference_ring.setOrigin({max_radius, max_radius});
+
+        filled_circle.setRadius(0.f);
+        filled_circle.setOrigin({0.f, 0.f});
+
+        float thickness = std::max(1.0f, size * 0.04f);
+        needle.setSize({0.f, thickness});
+        needle.setOrigin({0.f, thickness / 2.0f});
+    }
+
+    void setPosition(float x, float y) {
+        center_x = x + size / 2.0f;
+        center_y = y + size / 2.0f;
+
+        background.setPosition({center_x, center_y});
+        reference_ring.setPosition({center_x, center_y});
+        filled_circle.setPosition({center_x, center_y});
+        needle.setPosition({center_x, center_y});
+
+        probability_fill.setPosition({center_x, center_y + size/2.0f});
+    }
+
+    void setProbability(float prob) {
+        if (prob < 0.0f) prob = 0.0f;
+        if (prob > 1.0f) prob = 1.0f;
+
+        float h = prob * size;
+        probability_fill.setSize({size, h});
+        probability_fill.setOrigin({size / 2.0f, h});
     }
 
     void update(complex z) {
-        float magnitude = std::sqrt(z.real*z.real + z.imag*z.imag);
-        float phase = std::atan2(z.imag, z.real);
-        float probability = magnitude * magnitude;
+        float magnitude = std::sqrt(z.real * z.real + z.imag * z.imag);
+        if (magnitude > 1.0f) magnitude = 1.0f;
 
-        if (probability > 1.0f) probability = 1.0f;
+        float phase_rad = std::atan2(z.imag, z.real);
+        float phase_deg = phase_rad * 180.0f / 3.14159265f;
 
-        float fillHeight = probability * size;
-        fill.setSize({size, -fillHeight});
-        fill.setPosition({position.x, position.y + size});
+        float max_radius = (size / 2.0f) - 2.0f;
+        float current_radius = max_radius * magnitude;
 
-        float max_radius = size * 0.4f;
-        float line_len = max_radius;
-        float thickness = 2.0f;
+        filled_circle.setRadius(current_radius);
+        filled_circle.setOrigin({current_radius, current_radius});
 
-        radius_line.setSize({line_len, thickness});
-        radius_line.setOrigin({0.0f, thickness / 2.0f});
-        radius_line.setPosition({position.x + size/2.0f, position.y + size/2.0f});
-        radius_line.setRotation(sf::degrees(-phase * 180.0f / 3.14159f));
+        needle.setSize({size/2, needle.getSize().y});
+        needle.setRotation(sf::degrees(phase_deg));
     }
 
     void draw(sf::RenderWindow& window) {
         window.draw(background);
-        window.draw(fill);
-        window.draw(circle);
-        window.draw(radius_line);
-    }
+        if (probability_fill.getSize().y > 0.5f) {
+            window.draw(probability_fill);
+        }
 
-    void setPosition(float x, float y) {
-        sf::Vector2f center = {x + size / 2.0f, y + size / 2.0f};
+        window.draw(reference_ring);
 
-        background.setPosition({x, y});
-
-        fill.setPosition({x, y + size});
-
-        circle.setPosition(center);
-        radius_line.setPosition(center);
+        if (filled_circle.getRadius() > 0.5f) {
+            window.draw(filled_circle);
+            window.draw(needle);
+        }
     }
 };
+
 
 #endif //OOP_COMPLEX_CELL_H

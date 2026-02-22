@@ -7,6 +7,7 @@
 #include "spinning.h"
 #include "bloch.h"
 #include "amplitude.h"
+#include "density.h"
 
 std::unique_ptr<node> factory::CreateNode(NodeType type, float x, float y) {
     switch (type) {
@@ -18,6 +19,8 @@ std::unique_ptr<node> factory::CreateNode(NodeType type, float x, float y) {
             return std::make_unique<bloch>(x,y);
         case NodeType::Amplitutde:
             return std::make_unique<amplitude>(x,y);
+        case NodeType::Density:
+            return std::make_unique<density>(x,y);
 
         case NodeType::PauliX:
             return std::make_unique<halfturn>(x,y,halfturn_type::PauliX);

@@ -4,72 +4,58 @@
 #include "complex.h"
 #include "imgui.h"
 #include <cstdint>
+#include <cmath>
 
 class bloch : public node {
 private:
     sf::CircleShape sphere_outline;
     sf::CircleShape equator;
+    sf::VertexArray axes_lines;
     sf::CircleShape meridian;
-    sf::RectangleShape needle_shape;
+
+    sf::RectangleShape needle_line;
     sf::CircleShape needle_tip;
-    sf::VertexArray axes;
 
     float phys_x = 0;
     float phys_y = 0;
     float phys_z = 1;
+
 public:
     bloch(float x, float y) : node(x, y) {
-        float radius = 22.0f;
+        float radius = 21.5f;
+
         sphere_outline.setRadius(radius);
         sphere_outline.setOrigin({radius, radius});
         sphere_outline.setFillColor(sf::Color::Transparent);
-        sphere_outline.setOutlineColor(sf::Color(150, 150, 150,255));
-        sphere_outline.setOutlineThickness(1.5f);
+        sphere_outline.setOutlineColor(sf::Color(100, 100, 100, 255));
+        sphere_outline.setOutlineThickness(1.0f);
 
         equator.setRadius(radius);
         equator.setOrigin({radius, radius});
-        equator.setScale({1.0f, 0.3f});
+        equator.setScale({1.0f, 0.4f});
         equator.setFillColor(sf::Color::Transparent);
-        equator.setOutlineColor(sf::Color(150, 150, 150, 255));
-        equator.setOutlineThickness(2.0f);
+        equator.setOutlineColor(sf::Color(100, 100, 100, 255));
+        equator.setOutlineThickness(1.0f);
 
         meridian.setRadius(radius);
         meridian.setOrigin({radius, radius});
-        meridian.setScale({0.3f, 1.0f});
+        meridian.setScale({0.4f, 1.0f});
         meridian.setFillColor(sf::Color::Transparent);
-        meridian.setOutlineColor(sf::Color(150, 150, 150, 255));
-        meridian.setOutlineThickness(2.0f);
+        meridian.setOutlineColor(sf::Color(100, 100, 100, 255));
+        meridian.setOutlineThickness(1.0f);
 
-        needle_shape.setFillColor(sf::Color::Black);
+        axes_lines.setPrimitiveType(sf::PrimitiveType::Lines);
 
-        needle_tip.setRadius(2.5f);
-        needle_tip.setOrigin({2.5f, 2.5f});
-        needle_tip.setFillColor(sf::Color::Red);
-
-        axes.setPrimitiveType(sf::PrimitiveType::Lines);
-        axes.resize(6);
-        sf::Color axisColor(150, 150, 150);
-
-        axes[0].position = {0.f, -radius};
-        axes[0].color = axisColor;
-        axes[1].position = {0.f, radius};
-        axes[1].color = axisColor;
-
-        axes[2].position = {-radius, 0.f};
-        axes[2].color = axisColor;
-        axes[3].position = {radius, 0.f};
-        axes[3].color = axisColor;
-
-        float depth = radius * 0.3f;
-
-        axes[4].position = {-depth, depth};
-        axes[4].color = axisColor;
-        axes[5].position = {depth, -depth};
-        axes[5].color = axisColor;
+        needle_line.setFillColor(sf::Color::Black);
+        needle_tip.setRadius(3.0f);
+        needle_tip.setOrigin({3.0f, 3.0f});
+        needle_tip.setFillColor(sf::Color(144,189,166));
     }
+
     void DisplaySpecific(sf::RenderWindow& window) override {
         window.draw(shape);
-        sf::Vector2f center = {posx + 25.0f, posy + 25.0f};
+        sf::Vector2f center = {posx + sizex/2, posy + sizey/2};
+        float radius = 21.5f;
 
         sphere_outline.setPosition(center);
         equator.setPosition(center);
@@ -79,61 +65,71 @@ public:
         window.draw(equator);
         window.draw(meridian);
 
-        float radius = 22.0f;
-        float scale = 0.3f;
+        axes_lines.clear();
+        sf::Color axisColor(100, 100, 100, 255);
 
-        float u = radius * (phys_y + scale * phys_x);
-        float v = radius * (-phys_z + scale * phys_x);
+        sf::Vector2f z_top   = center + GetProjection(0, 0, 1, radius);
+        sf::Vector2f z_bot   = center + GetProjection(0, 0, -1, radius);
+        sf::Vector2f y_right = center + GetProjection(0, 1, 0, radius);
+        sf::Vector2f y_left  = center + GetProjection(0, -1, 0, radius);
+        sf::Vector2f x_front = center + GetProjection(1, 0, 0, radius);
+        sf::Vector2f x_back  = center + GetProjection(-1, 0, 0, radius);
 
-        sf::Vector2f endPoint = center + sf::Vector2f(u, v);
+        axes_lines.append(sf::Vertex(z_top, axisColor));
+        axes_lines.append(sf::Vertex(z_bot, axisColor));
+        axes_lines.append(sf::Vertex(y_left, axisColor));
+        axes_lines.append(sf::Vertex(y_right, axisColor));
+        axes_lines.append(sf::Vertex(x_back, axisColor));
+        axes_lines.append(sf::Vertex(x_front, axisColor));
 
-        sf::Vector2f diff = endPoint - center;
+        window.draw(axes_lines);
+
+        sf::Vector2f tipPos = center + GetProjection(phys_x, phys_y, phys_z, radius);
+
+        sf::Vector2f diff = tipPos - center;
         float len = std::sqrt(diff.x * diff.x + diff.y * diff.y);
         float angle = std::atan2(diff.y, diff.x) * 180.0f / 3.14159265f;
-        float thickness = 2.5f;
+        float thickness = 2.0f;
 
-        needle_shape.setSize({len, thickness});
-        needle_shape.setOrigin({0.0f, thickness / 2.0f});
-        needle_shape.setPosition(center);
-        needle_shape.setRotation(sf::degrees(angle));
+        needle_line.setSize({len, thickness});
+        needle_line.setOrigin({0.0f, thickness / 2.0f});
+        needle_line.setPosition(center);
+        needle_line.setRotation(sf::degrees(angle));
 
-        sf::Transform transform;
-        transform.translate(center);
-        window.draw(axes, transform);
-
-        window.draw(needle_shape);
-        needle_tip.setPosition(endPoint);
+        window.draw(needle_line);
+        needle_tip.setPosition(tipPos);
         window.draw(needle_tip);
     }
-    void LogicToDo(complex ca, complex cb, sf::Time dt,int index) override {
-        complex b_conj = {cb.real, -cb.imag};
 
-        complex prod = ca*b_conj;
+    void LogicToDo(complex ca, complex cb, sf::Time dt, int index) override {
 
-        phys_x = 2.0f * prod.real;
-        phys_y = 2.0f * prod.imag;
+        float ab_star_real = ca.real * cb.real + ca.imag * cb.imag;
+        float ab_star_imag = ca.imag * cb.real - ca.real * cb.imag;
+
+        phys_x = 2.0f * ab_star_real;
+        phys_y = -2.0f * ab_star_imag;
         phys_z = ca.absolute_squared() - cb.absolute_squared();
-
-        sf::Color c;
-
-        c.r = static_cast<unsigned char>(std::abs(phys_z) * 255);
-        c.g = static_cast<unsigned char>(std::abs(phys_y) * 255);
-        c.b = static_cast<unsigned char>(std::abs(phys_x) * 255);
-        c.a = 255;
-
-        if (c.r < 20 && c.g < 20 && c.b < 20) {
-            c = sf::Color::Black;
-        }
-
-        needle_tip.setFillColor(c);
     }
+
     void ShowContextMenu() override {
-        ImGui::Text("Bloch Sphere Visualization");
-        ImGui::Text("Red = Z Axis (|0>, |1>)");
-        ImGui::Text("Blue = X Axis (|+>, |->)");
-        ImGui::Text("Green = Y Axis (|i>, |-i>)");
+        ImGui::Text("Bloch Sphere");
         ImGui::Separator();
-        ImGui::Text("Vector: (%.2f, %.2f, %.2f)", phys_x, phys_y, phys_z);
+        ImGui::Text("State Vector:");
+        ImGui::Text("X: %.2f (|+> front)", phys_x);
+        ImGui::Text("Y: %.2f (|i> right)", phys_y);
+        ImGui::Text("Z: %.2f (|0> up)", phys_z);
+    }
+
+private:
+    sf::Vector2f GetProjection(float x, float y, float z, float radius) {
+
+        float depth_x = -0.4f;
+        float depth_y =  0.4f;
+
+        float screen_x = (y * 1.0f) + (x * depth_x);
+        float screen_y = (-z * 1.0f) + (x * depth_y);
+
+        return { screen_x * radius, screen_y * radius };
     }
 };
 

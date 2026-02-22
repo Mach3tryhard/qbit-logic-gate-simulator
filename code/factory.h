@@ -10,6 +10,7 @@ enum class NodeType {
     Chance,
     Bloch,
     Amplitutde,
+    Density,
     PauliX,
     PauliY,
     PauliZ,
