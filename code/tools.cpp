@@ -226,11 +226,12 @@ void tools::DrawGhostNode(sf::RenderWindow& window) {
 
     float rawX = (float)mousePos.x - 25.f;
     float rawY = (float)mousePos.y - 25.f;
+    if (settings::getInstance().snapping) {
+        rawX = std::round(rawX / settings::getInstance().snapping_val) * settings::getInstance().snapping_val;
+        rawY = std::round(rawY / settings::getInstance().snapping_val) * settings::getInstance().snapping_val;
+    }
 
-    float ghostX = std::round(rawX / settings::getInstance().snapping_val) * settings::getInstance().snapping_val;
-    float ghostY = std::round(rawY / settings::getInstance().snapping_val) * settings::getInstance().snapping_val;
-
-    ghostShape.setPosition({ghostX, ghostY});
+    ghostShape.setPosition({rawX, rawY});
 
     ghostShape.setFillColor(sf::Color(100, 255, 100, 128));
 

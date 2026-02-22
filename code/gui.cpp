@@ -52,7 +52,7 @@ void gui::MakeNodeCreator(sf::RenderWindow& window, std::vector<std::unique_ptr<
     ImGui::Begin("Input and Output");
     ImGui::Separator();
 
-    SpawnButton(window,nodes,"Qubit","images/qubit/state_0.png", NodeType::Qubit);
+    SpawnButton(window,nodes,"Qubit","images/output/qubit.png", NodeType::Qubit);
     ImGui::SameLine();
     SpawnButton(window,nodes,"Chance","images/output/chance.png", NodeType::Chance);
     ImGui::SameLine();
