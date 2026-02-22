@@ -2,6 +2,7 @@
 #define OOP_TOOLS_H
 #include <SFML/Graphics.hpp>
 #include "node.h"
+#include "settings.h"
 
 class tools {
 private:

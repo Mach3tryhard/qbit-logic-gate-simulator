@@ -5,13 +5,13 @@ void node::UpdatePosition(float x, float y) {
     posy = y;
     shape.setPosition({posx, posy});
     text.setPosition({posx, posy});
-    selected_shape.setPosition({posx - 2.5f, posy - 2.5f});
+    selected_shape.setPosition({posx-2.5f, posy-2.5f});
 }
 
 void node::DisplayLines(sf::RenderWindow& window) {
     float myX,myY;
-    myX = posx + 25.f;
-    myY = posy + 25.f;
+    myX = posx + sizex/2;
+    myY = posy + sizey/2;
 
     if (lines.size() != lista_adiacenta.size()) {
         lines.resize(lista_adiacenta.size());
@@ -22,8 +22,8 @@ void node::DisplayLines(sf::RenderWindow& window) {
 
         if (target!=nullptr) {
             float targetX,targetY;
-            targetX = target->get_posx() + 25.f;
-            targetY = target->get_posy()+ 25.f;
+            targetX = target->get_posx() + sizex/2;
+            targetY = target->get_posy()+ sizey/2;
 
             updateLineGeometry(lines[i], myX, myY, targetX, targetY, sf::Color::White);
 
@@ -32,7 +32,25 @@ void node::DisplayLines(sf::RenderWindow& window) {
     }
 }
 
+void node::DisplayPopup(sf::RenderWindow& window) {
+    ImGui::PushID(this);
+    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    bool isHovered = shape.getGlobalBounds().contains({(float)mousePos.x, (float)mousePos.y});
+    if (isHovered && sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+        ImGui::OpenPopup("NodeMenu");
+    }
+    if (ImGui::BeginPopup("NodeMenu")) {
+        ShowContextMenu();
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopID();
+}
+
 void node::DisplayNode(sf::RenderWindow& window) {
+    selected_shape.setSize({sizex+5.f,sizey+5.f});
+    shape.setSize({sizex,sizey});
+
     if (selected) {
         selected_shape.setFillColor(sf::Color(0,200,0));
         window.draw(selected_shape);
@@ -42,7 +60,9 @@ void node::DisplayNode(sf::RenderWindow& window) {
         window.draw(selected_shape);
         window.draw(draft_line);
     }
-    window.draw(shape);
+
+    DisplayPopup(window);
+
     DisplaySpecific(window);
 }
 
@@ -60,7 +80,7 @@ void node::updateLineGeometry(sf::RectangleShape& line, float x1, float y1, floa
 }
 
 void node::update_draft_line(float mouseX, float mouseY) {
-    updateLineGeometry(draft_line, posx + 25.f, posy + 25.f, mouseX, mouseY, sf::Color::Yellow);
+    updateLineGeometry(draft_line, posx + sizex/2, posy + sizey/2, mouseX, mouseY, sf::Color::Yellow);
 }
 
 void node::DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* targetToDelete) {
@@ -71,10 +91,7 @@ void node::DeleteSpecificNode(std::vector<std::unique_ptr<node>>& nodes, node* t
 
     for (auto it = nodes.begin(); it != nodes.end(); ++it) {
         if (it->get() == targetToDelete) {
-
             nodes.erase(it);
-
-            std::cout << "Nodul a fost sters.\n";
             return;
         }
     }

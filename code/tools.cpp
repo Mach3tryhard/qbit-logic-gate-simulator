@@ -26,7 +26,7 @@ void tools::MultipleSelect(sf::RenderWindow& window,std::vector<std::unique_ptr<
         window.draw(select_shape);
 
         for (size_t i=0;i<nodes.size();i++) {
-            if (nodes[i]->get_posx()+50.f>minposx && nodes[i]->get_posx()<maxposx && nodes[i]->get_posy()+50.f>minposy && nodes[i]->get_posy()<maxposy) {
+            if (nodes[i]->get_posx()+nodes[i]->getsizex()>minposx && nodes[i]->get_posx()<maxposx && nodes[i]->get_posy()+nodes[i]->getsizey()>minposy && nodes[i]->get_posy()<maxposy) {
                 nodes[i]->set_selected(true);
             }
         }
@@ -43,8 +43,8 @@ void tools::CheckSelect(sf::RenderWindow& window, std::vector<std::unique_ptr<no
             float posx = nodes[i]->get_posx();
             float posy = nodes[i]->get_posy();
 
-            if (localPosition.x > posx && localPosition.x < posx + 50.f &&
-                localPosition.y > posy && localPosition.y < posy + 50.f) {
+            if (localPosition.x > posx && localPosition.x < posx + nodes[i]->getsizex() &&
+                localPosition.y > posy && localPosition.y < posy + nodes[i]->getsizey()) {
 
                 nodes[i]->DeleteSpecificNode(nodes, nodes[i].get());
                 return;
@@ -52,10 +52,10 @@ void tools::CheckSelect(sf::RenderWindow& window, std::vector<std::unique_ptr<no
         }
 
         for (auto& sourceNode : nodes) {
-            sf::Vector2f A(sourceNode->get_posx() + 25.f, sourceNode->get_posy() + 25.f);
+            sf::Vector2f A(sourceNode->get_posx() + sourceNode->getsizex()/2, sourceNode->get_posy() + sourceNode->getsizey()/2);
 
             for (node* targetNode : sourceNode->get_connections()) {
-                sf::Vector2f B(targetNode->get_posx() + 25.f, targetNode->get_posy() + 25.f);
+                sf::Vector2f B(targetNode->get_posx() + sourceNode->getsizex()/2, targetNode->get_posy() + sourceNode->getsizey()/2);
 
                 float dist = distancePointToSegment(mousePosFloat, A, B);
 
@@ -75,8 +75,8 @@ void tools::CheckSelect(sf::RenderWindow& window, std::vector<std::unique_ptr<no
         float posx = nodes[i]->get_posx();
         float posy = nodes[i]->get_posy();
 
-        if (localPosition.x > posx && localPosition.x < posx + 50.f &&
-            localPosition.y > posy && localPosition.y < posy + 50.f ) {
+        if (localPosition.x > posx && localPosition.x < posx + nodes[i]->getsizex() &&
+            localPosition.y > posy && localPosition.y < posy + nodes[i]->getsizey() ) {
 
             drag_accumulator_x = 0.0f;
             drag_accumulator_y = 0.0f;
@@ -167,7 +167,7 @@ void tools::StartConnection(sf::RenderWindow& window,std::vector<std::unique_ptr
     for (size_t i = 0; i < nodes.size(); i++) {
         float posx = nodes[i]->get_posx();
         float posy = nodes[i]->get_posy();
-        if (mousePos.x > posx && mousePos.x < posx + 50.f && mousePos.y > posy && mousePos.y < posy + 50.f) {
+        if (mousePos.x > posx && mousePos.x < posx + nodes[i]->getsizex() && mousePos.y > posy && mousePos.y < posy + nodes[i]->getsizey()) {
             connection_index = i;
             nodes[i]->set_drafting(true);
             break;
@@ -188,8 +188,8 @@ void tools::EndConnection(sf::RenderWindow& window, std::vector<std::unique_ptr<
         float posx = nodes[i]->get_posx();
         float posy = nodes[i]->get_posy();
 
-        if (mousePos.x > posx && mousePos.x < posx + 50.f &&
-            mousePos.y > posy && mousePos.y < posy + 50.f) {
+        if (mousePos.x > posx && mousePos.x < posx + nodes[i]->getsizex() &&
+            mousePos.y > posy && mousePos.y < posy + nodes[i]->getsizey()) {
 
             node* sourceNode = nodes[connection_index].get();
             node* targetNode = nodes[i].get();
@@ -224,8 +224,11 @@ void tools::DrawGhostNode(sf::RenderWindow& window) {
 
     sf::RectangleShape ghostShape(sf::Vector2f(50.f, 50.f));
 
-    float ghostX = (float)mousePos.x - 25.f;
-    float ghostY = (float)mousePos.y - 25.f;
+    float rawX = (float)mousePos.x - 25.f;
+    float rawY = (float)mousePos.y - 25.f;
+
+    float ghostX = std::round(rawX / settings::getInstance().snapping_val) * settings::getInstance().snapping_val;
+    float ghostY = std::round(rawY / settings::getInstance().snapping_val) * settings::getInstance().snapping_val;
 
     ghostShape.setPosition({ghostX, ghostY});
 
@@ -243,8 +246,8 @@ void tools::HandleNodeContextMenu(sf::RenderWindow& window, std::vector<std::uni
         for (auto& n : nodes) {
             float px = n->get_posx();
             float py = n->get_posy();
-            if (mousePos.x > px && mousePos.x < px + 50 &&
-                mousePos.y > py && mousePos.y < py + 50) {
+            if (mousePos.x > px && mousePos.x < n->getsizex() &&
+                mousePos.y > py && mousePos.y < py + n->getsizey()) {
                 nodeWithOpenMenu = n.get();
                 ImGui::OpenPopup("NodeContextMenu");
                 break;

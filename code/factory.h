@@ -9,6 +9,7 @@ enum class NodeType {
     Qubit,
     Chance,
     Bloch,
+    Amplitutde,
     PauliX,
     PauliY,
     PauliZ,

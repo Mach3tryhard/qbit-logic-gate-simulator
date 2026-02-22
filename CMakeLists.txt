@@ -105,6 +105,10 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         code_nodes/formulaic.h
         code_nodes/bloch.cpp
         code_nodes/bloch.h
+        code_visual/complex_cell.cpp
+        code_visual/complex_cell.h
+        code_nodes/amplitude.cpp
+        code_nodes/amplitude.h
 )
 
 # NOTE: Add all defined targets (e.g. executables, libraries, etc. )
@@ -136,7 +140,7 @@ if(APPLE)
     install(FILES launcher.command DESTINATION ${DESTINATION_DIR})
 endif()
 
-target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code code_nodes)
+target_include_directories(${MAIN_EXECUTABLE_NAME} PRIVATE code code_nodes code_visual)
 
 copy_files(FILES tastatura.txt DIRECTORY code code_nodes fonts images COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
 # copy_files(FILES tastatura.txt config.json DIRECTORY images sounds COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})

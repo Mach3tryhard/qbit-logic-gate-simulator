@@ -86,9 +86,9 @@ public:
         int sourceCount = 0;
         for (auto& n : nodes) {
             if (auto* q = dynamic_cast<qubit*>(n.get())) {
-                sourceCount++;
                 complex dummy1, dummy2;
-                q->LogicToDo(dummy1, dummy2,dt);
+                q->LogicToDo(dummy1, dummy2,dt,sourceCount);
+                sourceCount++;
             }
         }
 

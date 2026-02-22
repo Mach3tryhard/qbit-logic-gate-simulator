@@ -68,6 +68,7 @@ public:
         axes[5].color = axisColor;
     }
     void DisplaySpecific(sf::RenderWindow& window) override {
+        window.draw(shape);
         sf::Vector2f center = {posx + 25.0f, posy + 25.0f};
 
         sphere_outline.setPosition(center);
@@ -104,7 +105,7 @@ public:
         needle_tip.setPosition(endPoint);
         window.draw(needle_tip);
     }
-    void LogicToDo(complex ca, complex cb, sf::Time dt) override {
+    void LogicToDo(complex ca, complex cb, sf::Time dt,int index) override {
         complex b_conj = {cb.real, -cb.imag};
 
         complex prod = ca*b_conj;

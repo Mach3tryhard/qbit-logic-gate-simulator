@@ -54,11 +54,12 @@ public:
     }
 
     void DisplaySpecific(sf::RenderWindow& window) override {
-        iconSprite.setPosition({posx + 25.0f, posy + 25.0f});
+        window.draw(shape);
+        iconSprite.setPosition({posx + sizex/2, posy + sizey/2});
         window.draw(iconSprite);
     }
 
-    void LogicToDo(complex ca, complex cb, sf::Time time) override {
+    void LogicToDo(complex ca, complex cb, sf::Time time,int index) override {
         float t_seconds = time.asSeconds();
 
         float val = EvaluateFunction(t_seconds);
@@ -81,7 +82,7 @@ public:
         for (auto& neighbor : lista_adiacenta) {
             std::pair<complex, complex> state;
             state = complex::MatrixMultiply(ca, cb, mat);
-            neighbor->LogicToDo(state.first, state.second, time);
+            neighbor->LogicToDo(state.first, state.second, time,index);
         }
     }
 
@@ -132,15 +133,15 @@ private:
     }
 
     void UpdateMatrix(float theta) {
-        float half_theta = theta / 2.0f;
-        float c = std::cos(half_theta);
-        float s = std::sin(half_theta);
+        float c = std::cos(theta);
+        float s = std::sin(theta);
+
         bool isZ = (gatetype == formulaic_type::Z_pow || gatetype == formulaic_type::RZ);
         bool isY = (gatetype == formulaic_type::Y_pow || gatetype == formulaic_type::RY);
         bool isX = (gatetype == formulaic_type::X_pow || gatetype == formulaic_type::RX);
 
         if (isZ) {
-            mat[0][0] = {c, -s}; mat[0][1] = {0, 0};
+            mat[0][0] = {1, 0};  mat[0][1] = {0, 0};
             mat[1][0] = {0, 0};  mat[1][1] = {c, s};
         }
         else if (isY) {

@@ -23,6 +23,7 @@ public:
         }
     }
     void DisplaySpecific(sf::RenderWindow& window) override {
+        window.draw(shape);
         this->text.setString(print_text);
 
         sf::FloatRect textRect = this->text.getLocalBounds();
@@ -30,15 +31,15 @@ public:
         this->text.setOrigin({textRect.position.x + textRect.size.x / 2.0f,
         textRect.position.y + textRect.size.y / 2.0f});
 
-        this->text.setPosition({posx + 25.0f, posy + 25.0f});
+        this->text.setPosition({posx + sizex/2, posy + sizey/2});
 
-        fill.setPosition({posx,posy+50.f});
-        fill.setSize({50.f,-prob_on / 100.0f * 50.0f});
+        fill.setPosition({posx,posy+ sizey});
+        fill.setSize({sizex,-prob_on / 100.0f * sizey});
         window.draw(fill);
 
         window.draw(text);
     }
-    void LogicToDo(complex ca,complex cb,sf::Time dt) override {
+    void LogicToDo(complex ca,complex cb,sf::Time dt,int index) override {
         prob_on = cb.absolute_squared() * 100.0f;
         if (prob_on > 100.0f) prob_on = 100.0f;
         if (prob_on < 0.0f)   prob_on = 0.0f;

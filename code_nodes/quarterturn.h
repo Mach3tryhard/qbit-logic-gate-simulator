@@ -38,15 +38,16 @@ public:
     }
 
     void DisplaySpecific(sf::RenderWindow& window) override {
+        window.draw(shape);
         iconSprite.setPosition({posx + 25.0f, posy + 25.0f});
         window.draw(iconSprite);
     }
 
-    void LogicToDo(complex ca, complex cb,sf::Time dt) override {
+    void LogicToDo(complex ca, complex cb,sf::Time dt,int index) override {
         for (size_t i=0;i<lista_adiacenta.size();i++) {
             std::pair<complex,complex> state;
             state = complex::MatrixMultiply(ca,cb,mat);
-            lista_adiacenta[i]->LogicToDo(state.first,state.second,dt);
+            lista_adiacenta[i]->LogicToDo(state.first,state.second,dt,index);
         }
     }
 
